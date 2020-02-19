@@ -1,16 +1,14 @@
 plugins {
     kotlin("jvm") version "1.3.61"
-    application
 }
+
+val rdf4j = "3.1.0"
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
 
-    implementation(project(":core"))
-}
+    implementation("org.eclipse.rdf4j:rdf4j-client:$rdf4j")
 
-application {
-    mainClassName = "MainKt"
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
