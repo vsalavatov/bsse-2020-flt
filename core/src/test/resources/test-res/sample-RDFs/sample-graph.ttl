@@ -1,0 +1,5 @@
+PREFIX : <graph:>
+PREFIX r: <rel:>
+:a r:edge :b, :c, :d .
+:b r:edge :c, :d .
+:c r:edge :d .
