@@ -13,7 +13,7 @@ Formal Language Theory @ SPBU MSE assignment: Graph Database
   ```
 * test:
   ```bash
-  $ gradlew test
+  $ gradlew cleanTest test
   ```  
 * run:
   ```bash

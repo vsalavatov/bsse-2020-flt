@@ -1,7 +1,3 @@
-plugins {
-    kotlin("jvm") version "1.3.61"
-}
-
 val rdf4j = "3.1.0"
 
 dependencies {
