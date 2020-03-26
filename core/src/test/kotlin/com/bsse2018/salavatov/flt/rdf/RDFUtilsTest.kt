@@ -1,4 +1,4 @@
-package com.bsse2018.salavatov.graphdb.rdf
+package com.bsse2018.salavatov.flt.rdf
 
 import org.eclipse.rdf4j.model.IRI
 import org.eclipse.rdf4j.model.Literal
@@ -21,7 +21,10 @@ internal class RDFUtilsTest {
         fun `artists sample`() {
             val resource = "test-res/sample-RDFs/example-data-artists.ttl".asResource()
                 ?: throw FileNotFoundException("test resource file not found")
-            val model = loadRDF(ByteArrayInputStream(resource.readBytes()), RDFFormat.TURTLE)
+            val model = loadRDF(
+                ByteArrayInputStream(resource.readBytes()),
+                RDFFormat.TURTLE
+            )
 
             val vf = SimpleValueFactory.getInstance()
             val vanGogh: IRI = vf.createIRI("http://example.org/VanGogh")
@@ -31,7 +34,8 @@ internal class RDFUtilsTest {
             var foundSunflowers = false
 
             aboutVanGogh.forEach {
-                foundFirstName = foundFirstName || ((it.predicate as IRI).stringValue() == "http://xmlns.com/foaf/0.1/firstName")
+                foundFirstName =
+                    foundFirstName || ((it.predicate as IRI).stringValue() == "http://xmlns.com/foaf/0.1/firstName")
                 foundLastName = foundLastName || ((it.predicate as IRI).stringValue() == "http://xmlns.com/foaf/0.1/surname")
                 foundSunflowers = foundSunflowers || (it.`object`.stringValue() == "http://example.org/sunflowers")
             }
@@ -44,7 +48,10 @@ internal class RDFUtilsTest {
         fun `graph sample`() {
             val resource = "test-res/sample-RDFs/sample-graph.ttl".asResource()
                 ?: throw FileNotFoundException("test resource file not found")
-            val model = loadRDF(ByteArrayInputStream(resource.readBytes()), RDFFormat.TURTLE)
+            val model = loadRDF(
+                ByteArrayInputStream(resource.readBytes()),
+                RDFFormat.TURTLE
+            )
 
             val graph = mutableMapOf<String, MutableSet<String>>()
             var edges = 0

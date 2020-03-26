@@ -1,4 +1,4 @@
-package com.bsse2018.salavatov.graphdb.automata
+package com.bsse2018.salavatov.flt.automata
 
 import dk.brics.automaton.RegExp
 import org.junit.jupiter.api.Assertions.*

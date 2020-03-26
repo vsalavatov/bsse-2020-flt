@@ -1,4 +1,4 @@
-package com.bsse2018.salavatov.graphdb.rdf
+package com.bsse2018.salavatov.flt.rdf
 
 import org.eclipse.rdf4j.model.Model
 import org.eclipse.rdf4j.rio.RDFFormat
