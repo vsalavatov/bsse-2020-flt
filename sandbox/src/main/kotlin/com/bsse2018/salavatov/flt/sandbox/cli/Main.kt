@@ -29,7 +29,7 @@ fun main() {
         val cnf = grammar.toChomskyNormalForm()
         val cnfRules = cnf.rules.toTypedArray()
         cnfRules.sortBy {
-            if (it.from == grammar.start) {
+            if (it.from == cnf.start) {
                 ""
             } else {
                 it.from
