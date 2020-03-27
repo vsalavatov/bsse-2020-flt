@@ -1,7 +1,7 @@
 # bsse-2020-flt
 Formal Language Theory @ SPBU MSE home assignments
 
-[![Build Status](https://travis-ci.org/vsalavatov/bsse-2020-graph-db.svg?branch=master)](https://travis-ci.org/vsalavatov/bsse-2020-flt)
+[![Build Status](https://travis-ci.org/vsalavatov/bsse-2020-flt.svg?branch=master)](https://travis-ci.org/vsalavatov/bsse-2020-flt.svg?branch=master)
 
 ## Prerequisites 
 * openjdk11
