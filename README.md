@@ -1,7 +1,7 @@
-# bsse-2020-graph-db
-Formal Language Theory @ SPBU MSE assignment: Graph Database
+# bsse-2020-flt
+Formal Language Theory @ SPBU MSE home assignments
 
-[![Build Status](https://travis-ci.org/vsalavatov/bsse-2020-graph-db.svg?branch=master)](https://travis-ci.org/vsalavatov/bsse-2020-graph-db)
+[![Build Status](https://travis-ci.org/vsalavatov/bsse-2020-flt.svg?branch=master)](https://travis-ci.org/vsalavatov/bsse-2020-flt.svg?branch=master)
 
 ## Prerequisites 
 * openjdk11
@@ -17,7 +17,8 @@ Formal Language Theory @ SPBU MSE assignment: Graph Database
   ```  
 * run:
   ```bash
-  $ gradlew run
+  $ gradlew build
+  $ java -jar sandbox/build/libs/sandbox-all.jar <input_file> <output_file>
   ``` 
 ## Author
 Vadim Salavatov <xremmargorpx@gmail.com>

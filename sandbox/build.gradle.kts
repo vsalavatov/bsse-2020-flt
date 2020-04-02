@@ -1,5 +1,6 @@
 plugins {
     application
+    id("com.github.johnrengelman.shadow") version "5.2.0"
 }
 
 dependencies {
@@ -9,7 +10,7 @@ dependencies {
 }
 
 application {
-    mainClassName = "MainKt"
+    mainClassName = "com.bsse2018.salavatov.flt.sandbox.cli.MainKt"
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
