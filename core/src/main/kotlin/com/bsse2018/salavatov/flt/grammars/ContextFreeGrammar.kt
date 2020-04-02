@@ -4,6 +4,7 @@ import java.util.*
 import kotlin.collections.HashSet
 
 class EmptyLanguageException : Exception("Grammar is not habitable")
+class InvalidFormatException(desc: String) : Exception("Invalid format: $desc")
 
 class ContextFreeGrammar(val start: String, rules_: HashSet<Rule>) {
     val rules: HashSet<Rule> = hashSetOf<Rule>()
@@ -354,6 +355,18 @@ class ContextFreeGrammar(val start: String, rules_: HashSet<Rule>) {
             .reduceLongTerminalRules()
     }
 
+    fun dumpAsStrings(): Array<String> {
+        val arrRules = rules.toTypedArray()
+        arrRules.sortBy {
+            if (it.from == start) {
+                ""
+            } else {
+                it.from
+            }
+        }
+        return arrRules.map { "${it.from} ${it.to.joinToString(" ")}" }.toTypedArray()
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -379,5 +392,24 @@ class ContextFreeGrammar(val start: String, rules_: HashSet<Rule>) {
 
         fun isTerminal(node: String) = terminalMatcher.matches(node)
         fun isNonTerminal(node: String) = nonTerminalMatcher.matches(node)
+
+        fun parseRule(desc: String): Rule {
+            val tokens = desc.trim().split(Regex("\\s+"))
+            if (tokens.size <= 1)
+                throw InvalidFormatException("at least 1 token must be presented on rhs")
+            if (!isNonTerminal(tokens[0]))
+                throw InvalidFormatException("lhs must be a nonterminal")
+            return Rule(tokens[0], tokens.drop(1).toTypedArray())
+        }
+
+        fun rulesFromStrings(desc: Array<String>) = desc.map(::parseRule).toHashSet()
+
+        fun fromStrings(desc: Array<String>): ContextFreeGrammar {
+            val rules = rulesFromStrings(desc)
+            if (rules.isEmpty())
+                throw EmptyLanguageException()
+            val startRule = parseRule(desc[0])
+            return ContextFreeGrammar(startRule.from, rules)
+        }
     }
 }

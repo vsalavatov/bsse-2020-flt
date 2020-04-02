@@ -18,7 +18,7 @@ Formal Language Theory @ SPBU MSE home assignments
 * run:
   ```bash
   $ gradlew build
-  $ java -jar sandbox/build/libs/sandbox-all.jar < input_file > output_file
+  $ java -jar sandbox/build/libs/sandbox-all.jar <input_file> <output_file>
   ``` 
 ## Author
 Vadim Salavatov <xremmargorpx@gmail.com>
