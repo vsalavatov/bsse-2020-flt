@@ -194,6 +194,24 @@ internal class ContextFreeGrammarTest {
     }
 
     @Test
+    fun toWeakChomskyNormalForm() {
+        val brackets = CFGBrackets()
+        val grammar = brackets.toWeakChomskyNormalForm()
+        assertEquals(
+            grammar,
+            ContextFreeGrammar.fromStrings(
+                arrayOf(
+                    "S eps", "S S0 S",
+                    "S0 S1 S3",
+                    "S1 S2 S",
+                    "S2 a",
+                    "S3 b"
+                )
+            )
+        )
+    }
+
+    @Test
     fun dumpAsStrings() {
         val desc = arrayOf(
             "S X c", "S a S b S",

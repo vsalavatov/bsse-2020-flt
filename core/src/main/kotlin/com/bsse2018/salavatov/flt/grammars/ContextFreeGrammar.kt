@@ -181,8 +181,8 @@ class ContextFreeGrammar(val start: String, rules_: HashSet<Rule>) {
     }
 
     fun reduceUnitRules(): ContextFreeGrammar {
-        if (!isEpsilonReduced())
-            return reduceEpsilonRules().reduceUnitRules()
+        if (!hasOnlySmallRules())
+            return shrinkLongRules().reduceUnitRules()
 
         val nonUnitRules = hashMapOf<String, ArrayList<Rule>>()
         val unitRules = hashMapOf<String, ArrayList<Rule>>()
@@ -221,12 +221,10 @@ class ContextFreeGrammar(val start: String, rules_: HashSet<Rule>) {
     }
 
     fun isUnitReduced(): Boolean {
-        return isEpsilonReduced() && rules.all { !it.isUnit() }
+        return rules.all { !it.isUnit() }
     }
 
     fun generatingRules(): HashSet<Rule> {
-        assert(isEpsilonReduced())
-
         val generatingNonTerminals = hashSetOf<String>()
         val concernedRules = hashMapOf<String, HashSet<Rule>>()
         val nonGeneratingNonTerminals = hashMapOf<Rule, HashSet<String>>()
@@ -349,6 +347,15 @@ class ContextFreeGrammar(val start: String, rules_: HashSet<Rule>) {
         return grammar
             .shrinkLongRules()
             .reduceEpsilonRules()
+            .reduceUnitRules()
+            .reduceNonGeneratingRules()
+            .reduceUnreachable()
+            .reduceLongTerminalRules()
+    }
+
+    fun toWeakChomskyNormalForm(): ContextFreeGrammar {
+        return this
+            .shrinkLongRules()
             .reduceUnitRules()
             .reduceNonGeneratingRules()
             .reduceUnreachable()
