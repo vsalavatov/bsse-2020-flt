@@ -10,7 +10,7 @@ dependencies {
 }
 
 application {
-    mainClassName = "com.bsse2018.salavatov.flt.sandbox.cli.MainKt"
+    mainClassName = "com.bsse2018.salavatov.flt.hellings.cli.MainKt"
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {

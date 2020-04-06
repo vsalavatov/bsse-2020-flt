@@ -1,4 +1,4 @@
-package com.bsse2018.salavatov.flt.sandbox.cli
+package com.bsse2018.salavatov.flt.cnfconv.cli
 
 import com.bsse2018.salavatov.flt.grammars.ContextFreeGrammar
 import com.bsse2018.salavatov.flt.grammars.EmptyLanguageException

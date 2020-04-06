@@ -17,8 +17,8 @@ Formal Language Theory @ SPBU MSE home assignments
   ```  
 * run:
   ```bash
-  $ gradlew build
-  $ java -jar sandbox/build/libs/sandbox-all.jar <input_file> <output_file>
+  $ gradlew installDist
   ``` 
+  Исполняемые файлы находятся в папках вида `{task}/build/install/{task}/bin`
 ## Author
 Vadim Salavatov <xremmargorpx@gmail.com>
