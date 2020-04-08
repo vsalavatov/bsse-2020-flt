@@ -113,7 +113,7 @@ class ContextFreeGrammar(val start: String, rules_: HashSet<Rule>) {
         val queue = ArrayDeque<String>()
 
         nonProducingNonTerminals
-            .filter { it.key.isTerminal() }
+            .filter { it.key.isEpsilon() }
             .forEach {
                 val rule = it.key
                 if (produceEps[rule.from] == false) {
