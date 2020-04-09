@@ -5,6 +5,7 @@ dependencies {
 
     implementation("org.eclipse.rdf4j:rdf4j-client:$rdf4j")
     implementation("dk.brics:automaton:1.12-1")
+    implementation("org.la4j:la4j:0.6.0")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.3.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.3.1")

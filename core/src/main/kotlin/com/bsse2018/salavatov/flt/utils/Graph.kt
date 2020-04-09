@@ -1,7 +1,6 @@
 package com.bsse2018.salavatov.flt.utils
 
 import java.lang.Exception
-import kotlin.system.exitProcess
 
 class GraphInvalidFormatException(desc: String) : Exception("Invalid graph format: $desc")
 

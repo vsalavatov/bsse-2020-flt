@@ -2,5 +2,6 @@ rootProject.name = 'graph-db'
 include 'cnfconv'
 include 'cykquery'
 include 'hellings'
+include 'cfpqmatrix'
 include 'core'
 
