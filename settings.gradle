@@ -1,4 +1,6 @@
 rootProject.name = 'graph-db'
-include 'sandbox'
+include 'cnfconv'
+include 'cykquery'
+include 'hellings'
 include 'core'
 
