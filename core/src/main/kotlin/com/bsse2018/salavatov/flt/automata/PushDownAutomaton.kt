@@ -116,7 +116,7 @@ internal class PDABuilder {
                 var curStart = start
                 for (i in 0 until node.sequence.size - 1) {
                     val newStart = newNode()
-                    insert(start, newStart, node.sequence[i])
+                    insert(curStart, newStart, node.sequence[i])
                     curStart = newStart
                 }
                 insert(curStart, finish, node.sequence.last())

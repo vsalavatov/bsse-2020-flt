@@ -49,6 +49,26 @@ internal class PushDownAutomatonTest {
             val pda = PushDownAutomaton.fromStrings(rules)
             assertEquals(expected, pda)
         }
+
+        @Test
+        fun `Worst case extended grammar`() {
+            val pda = PushDownAutomaton.fromStrings(
+                listOf("S a b | a S b")
+            )
+            val expected = PushDownAutomaton(
+                listOf(
+                    listOf("a" to 2, "a" to 3),
+                    listOf(),
+                    listOf("b" to 1),
+                    listOf("S" to 4),
+                    listOf("b" to 1)
+                ),
+                mapOf("S" to 0),
+                mapOf("S" to listOf(1)),
+                "S"
+            )
+            assertEquals(expected, pda)
+        }
     }
 
     @Nested
