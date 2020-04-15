@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 import com.bsse2018.salavatov.flt.utils.Graph
 
 abstract class CFPQCommonTestSuite {
-    abstract fun runQuery(graph: Graph, wcnf: ContextFreeGrammar): HashSet<Pair<Int, Int>>
+    abstract fun runQuery(graph: Graph, wcnf: ContextFreeGrammar): Set<Pair<Int, Int>>
 
     @Test
     fun `correct bracket sequence`() {
@@ -20,7 +20,7 @@ abstract class CFPQCommonTestSuite {
         )
         val grammar = TestDataCollection.correctBracketSequenceGrammar().toWeakChomskyNormalForm()
         Assertions.assertEquals(
-            hashSetOf(
+            setOf(
                 Pair(0, 5), Pair(0, 4),
                 Pair(1, 5), Pair(1, 3), Pair(1, 0), Pair(1, 4),
                 Pair(3, 0), Pair(3, 5), Pair(3, 4),
@@ -43,7 +43,7 @@ abstract class CFPQCommonTestSuite {
         )
         val grammar = TestDataCollection.correctBracketSequenceAmbiguousGrammar().toWeakChomskyNormalForm()
         Assertions.assertEquals(
-            hashSetOf(
+            setOf(
                 Pair(0, 5), Pair(0, 4),
                 Pair(1, 5), Pair(1, 3), Pair(1, 0), Pair(1, 4),
                 Pair(3, 0), Pair(3, 5), Pair(3, 4),
@@ -58,7 +58,7 @@ abstract class CFPQCommonTestSuite {
         val graph = TestDataCollection.CYKWorstCaseGraph()
         val grammar = TestDataCollection.CYKWorstCaseGrammar().toWeakChomskyNormalForm()
         Assertions.assertEquals(
-            hashSetOf(Pair(1, 3), Pair(0, 2), Pair(2, 3), Pair(1, 2), Pair(0, 3), Pair(2, 2)),
+            setOf(Pair(1, 3), Pair(0, 2), Pair(2, 3), Pair(1, 2), Pair(0, 3), Pair(2, 2)),
             runQuery(graph, grammar)
         )
     }
@@ -68,7 +68,7 @@ abstract class CFPQCommonTestSuite {
         val graph = listOf<List<Pair<String, Int>>>()
         val grammar = TestDataCollection.correctBracketSequenceGrammar().toWeakChomskyNormalForm()
         Assertions.assertEquals(
-            hashSetOf<Pair<Int, Int>>(),
+            setOf<Pair<Int, Int>>(),
             runQuery(graph, grammar)
         )
     }
@@ -89,7 +89,7 @@ abstract class CFPQCommonTestSuite {
         )
         val grammar = TestDataCollection.correctBracketSequenceAmbiguousGrammar().toWeakChomskyNormalForm()
         Assertions.assertEquals(
-            hashSetOf(
+            setOf(
                 Pair(0, 5), Pair(0, 4), Pair(0, 7), Pair(0, 8), Pair(0, 9), Pair(0, 1), Pair(0, 3),
                 Pair(1, 5), Pair(1, 3), Pair(1, 0), Pair(1, 4), Pair(1, 7), Pair(1, 8), Pair(1, 9),
                 Pair(3, 0), Pair(3, 5), Pair(3, 4), Pair(3, 7), Pair(3, 8), Pair(3, 9), Pair(3, 1),
@@ -116,7 +116,7 @@ abstract class CFPQCommonTestSuite {
         )
         val grammar = TestDataCollection.inherentlyAmbiguousGrammar().toWeakChomskyNormalForm()
         Assertions.assertEquals(
-            hashSetOf(
+            setOf(
                 Pair(0, 8), Pair(0, 7),
                 Pair(2, 8), Pair(2, 7)
             ),
