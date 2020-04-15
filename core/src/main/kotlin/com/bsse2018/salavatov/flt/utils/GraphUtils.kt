@@ -2,9 +2,11 @@ package com.bsse2018.salavatov.flt.utils
 
 import java.lang.Exception
 
+typealias Graph = Array<Array<Pair<String, Int>>>
+
 class GraphInvalidFormatException(desc: String) : Exception("Invalid graph format: $desc")
 
-fun graphFromStrings(desc: Array<String>): Array<Array<Pair<String, Int>>> {
+fun graphFromStrings(desc: Array<String>): Graph {
     val triples = desc.map {
         val tokens = it.trim().split(Regex("\\s+"))
         if (tokens.size != 3) {

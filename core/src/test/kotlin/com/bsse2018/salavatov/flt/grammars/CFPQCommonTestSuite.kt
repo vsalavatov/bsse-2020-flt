@@ -2,9 +2,10 @@ package com.bsse2018.salavatov.flt.grammars
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import com.bsse2018.salavatov.flt.utils.Graph
 
 abstract class CFPQCommonTestSuite {
-    abstract fun runQuery(graph: Array<Array<Pair<String, Int>>>, wcnf: ContextFreeGrammar): HashSet<Pair<Int, Int>>
+    abstract fun runQuery(graph: Graph, wcnf: ContextFreeGrammar): HashSet<Pair<Int, Int>>
 
     @Test
     fun `correct bracket sequence`() {

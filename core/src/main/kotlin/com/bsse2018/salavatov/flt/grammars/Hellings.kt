@@ -1,9 +1,10 @@
 package com.bsse2018.salavatov.flt.grammars
 
+import com.bsse2018.salavatov.flt.utils.Graph
 import java.util.*
 import kotlin.collections.HashSet
 
-fun HellingsQuery(graph: Array<Array<Pair<String, Int>>>, wcnf: ContextFreeGrammar): HashSet<Pair<Int, Int>> {
+fun HellingsQuery(graph: Graph, wcnf: ContextFreeGrammar): HashSet<Pair<Int, Int>> {
     val dp = Array(graph.size) { Array(graph.size) { hashSetOf<String>() } }
     val queue = ArrayDeque<Triple<String, Int, Int>>()
     val epsilonRules = wcnf.rules.filter { it.isEpsilon() }
