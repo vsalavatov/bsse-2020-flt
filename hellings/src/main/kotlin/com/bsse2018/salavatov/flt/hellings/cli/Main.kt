@@ -14,12 +14,12 @@ fun main(args: Array<String>) {
         println("Arguments: <grammar file> <graph file> <output file>")
         return
     }
-    val rawGrammar = File(args[0]).readLines().filter { it.isNotEmpty() }.toTypedArray()
+    val rawGrammar = File(args[0]).readLines().filter { it.isNotEmpty() }
     val grammar = ContextFreeGrammar.fromStrings(rawGrammar)
     val rawGraph = File(args[1]).readLines().filter { it.isNotEmpty() }
 
     try {
-        val graph = graphFromStrings(rawGraph.toTypedArray())
+        val graph = graphFromStrings(rawGraph)
         val wcnf = grammar.toWeakChomskyNormalForm()
         val hellings = HellingsQuery(graph, wcnf)
 

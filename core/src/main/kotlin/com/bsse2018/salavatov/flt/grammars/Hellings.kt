@@ -5,7 +5,7 @@ import java.util.*
 import kotlin.collections.HashSet
 
 fun HellingsQuery(graph: Graph, wcnf: ContextFreeGrammar): HashSet<Pair<Int, Int>> {
-    val dp = Array(graph.size) { Array(graph.size) { hashSetOf<String>() } }
+    val dp = List(graph.size) { List(graph.size) { hashSetOf<String>() } }
     val queue = ArrayDeque<Triple<String, Int, Int>>()
     val epsilonRules = wcnf.rules.filter { it.isEpsilon() }
     val symRules = wcnf.rules.filter { it.isTerminal() }
@@ -35,7 +35,7 @@ fun HellingsQuery(graph: Graph, wcnf: ContextFreeGrammar): HashSet<Pair<Int, Int
             val postponedAdd = hashSetOf<String>()
             dp[ufrom][u].forEach { nonTermBefore ->
                 wcnf.rules
-                    .filter { it.to.contentEquals(arrayOf(nonTermBefore, nonTerm)) }
+                    .filter { it.to == listOf(nonTermBefore, nonTerm) }
                     .forEach { rule ->
                         if (!dp[ufrom][v].contains(rule.from) && !postponedAdd.contains(rule.from)) {
                             postponedAdd.add(rule.from)
@@ -49,7 +49,7 @@ fun HellingsQuery(graph: Graph, wcnf: ContextFreeGrammar): HashSet<Pair<Int, Int
             val postponedAdd = hashSetOf<String>()
             dp[v][vto].forEach { nonTermAfter ->
                 wcnf.rules
-                    .filter { it.to.contentEquals(arrayOf(nonTerm, nonTermAfter)) }
+                    .filter { it.to == listOf(nonTerm, nonTermAfter) }
                     .forEach { rule ->
                         if (!dp[u][vto].contains(rule.from) && !postponedAdd.contains(rule.from)) {
                             postponedAdd.add(rule.from)

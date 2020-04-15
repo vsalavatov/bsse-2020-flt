@@ -14,15 +14,15 @@ internal class ContextFreeGrammarTest {
         val grammar = ContextFreeGrammar(
             "S",
             hashSetOf(
-                Rule("S", arrayOf("a", "b", "c", "d"))
+                Rule("S", listOf("a", "b", "c", "d"))
             )
         )
         val result = grammar.shrinkLongRules()
         assertTrue(result.hasOnlySmallRules())
         assertEquals(3, result.rules.size)
-        assertTrue(result.rules.contains(Rule("S", arrayOf("S0", "d"))))
-        assertTrue(result.rules.contains(Rule("S0", arrayOf("S1", "c"))))
-        assertTrue(result.rules.contains(Rule("S1", arrayOf("a", "b"))))
+        assertTrue(result.rules.contains(Rule("S", listOf("S0", "d"))))
+        assertTrue(result.rules.contains(Rule("S0", listOf("S1", "c"))))
+        assertTrue(result.rules.contains(Rule("S1", listOf("a", "b"))))
     }
 
     @Test
@@ -36,12 +36,12 @@ internal class ContextFreeGrammarTest {
     fun hasOnlySmallRules() {
         assertTrue(
             ContextFreeGrammar(
-                "S", rulesFromStrings(arrayOf("S a b", "S eps"))
+                "S", rulesFromStrings(listOf("S a b", "S eps"))
             ).hasOnlySmallRules()
         )
         assertFalse(
             ContextFreeGrammar(
-                "S", rulesFromStrings(arrayOf("S a b N", "S eps", "N eps"))
+                "S", rulesFromStrings(listOf("S a b N", "S eps", "N eps"))
             ).hasOnlySmallRules()
         )
     }
@@ -88,12 +88,12 @@ internal class ContextFreeGrammarTest {
                     } else {
                         it
                     }
-                }.toTypedArray())
+                })
             }.toHashSet()
         )
         assertEquals(
             rulesFromStrings(
-                arrayOf(
+                listOf(
                     "S d", "S S0 d",
                     "S0 S1",
                     "S1 A B", "S1 B", "S1 A",
@@ -117,12 +117,12 @@ internal class ContextFreeGrammarTest {
                     } else {
                         it
                     }
-                }.toTypedArray())
+                })
             }.toHashSet()
         )
         assertEquals(
             ContextFreeGrammar.fromStrings(
-                arrayOf(
+                listOf(
                     "S d", "S S0 d",
                     "S0 S1",
                     "S1 A B", "S1 B", "S1 A",
@@ -137,7 +137,7 @@ internal class ContextFreeGrammarTest {
     @Test
     fun reduceUnreachable() {
         val grammar = ContextFreeGrammar.fromStrings(
-            arrayOf(
+            listOf(
                 "S X",
                 "X x", "X X",
                 "AAA3 X"
@@ -145,7 +145,7 @@ internal class ContextFreeGrammarTest {
         )
         assertEquals(
             ContextFreeGrammar.fromStrings(
-                arrayOf(
+                listOf(
                     "S X",
                     "X x", "X X"
                 )
@@ -157,7 +157,7 @@ internal class ContextFreeGrammarTest {
     @Test
     fun reduceLongTerminalRules() {
         val grammar = ContextFreeGrammar.fromStrings(
-            arrayOf(
+            listOf(
                 "S A A", "S A",
                 "A a B", "A x A",
                 "B b a"
@@ -165,7 +165,7 @@ internal class ContextFreeGrammarTest {
         )
         assertEquals(
             ContextFreeGrammar.fromStrings(
-                arrayOf(
+                listOf(
                     "S A A", "S A",
                     "A S0 B", "A S1 A",
                     "B S2 S0",
@@ -184,7 +184,7 @@ internal class ContextFreeGrammarTest {
         val grammar = brackets.toChomskyNormalForm()
         assertEquals(
             ContextFreeGrammar.fromStrings(
-                arrayOf(
+                listOf(
                     "S3 S2 S0", "S3 S1 S", "S3 eps",
                     "S S1 S", "S S2 S0",
                     "S1 S2 S0",
@@ -203,7 +203,7 @@ internal class ContextFreeGrammarTest {
         val grammar = brackets.toWeakChomskyNormalForm()
         assertEquals(
             ContextFreeGrammar.fromStrings(
-                arrayOf(
+                listOf(
                     "S eps", "S S0 S",
                     "S0 S1 S3",
                     "S1 S2 S",
@@ -217,11 +217,11 @@ internal class ContextFreeGrammarTest {
 
     @Test
     fun dumpAsStrings() {
-        val desc = arrayOf(
+        val desc = listOf(
             "S X c", "S a S b S",
             "X c z", "X eps"
         )
-        assertArrayEquals(
+        assertEquals(
             desc,
             ContextFreeGrammar.fromStrings(desc).dumpAsStrings()
         )
@@ -232,7 +232,7 @@ internal class ContextFreeGrammarTest {
         @Test
         fun parseRule() {
             assertEquals(
-                Rule("S", arrayOf("a", "S", "b", "S")),
+                Rule("S", listOf("a", "S", "b", "S")),
                 ContextFreeGrammar.parseRule("S a S b S")
             )
             assertThrows(InvalidFormatException::class.java) { ContextFreeGrammar.parseRule("S") }
@@ -243,17 +243,17 @@ internal class ContextFreeGrammarTest {
         fun rulesFromStrings() {
             assertEquals(
                 hashSetOf<Rule>(
-                    Rule("S", arrayOf("a", "b", "S")),
-                    Rule("X", arrayOf("a", "S"))
+                    Rule("S", listOf("a", "b", "S")),
+                    Rule("X", listOf("a", "S"))
                 ),
-                rulesFromStrings(arrayOf("S a b S", "X a S"))
+                rulesFromStrings(listOf("S a b S", "X a S"))
             )
         }
 
         @Test
         fun fromStrings() {
             val cfg = ContextFreeGrammar.fromStrings(
-                arrayOf(
+                listOf(
                     "S A B C d",
                     "A a", "A eps",
                     "B A C",
@@ -262,14 +262,14 @@ internal class ContextFreeGrammarTest {
             )
             assertEquals("S", cfg.start)
             assertEquals(6, cfg.rules.size)
-            assertTrue(cfg.rules.contains(Rule("B", arrayOf("A", "C"))))
-            assertTrue(cfg.rules.contains(Rule("C", arrayOf(Epsilon))))
+            assertTrue(cfg.rules.contains(Rule("B", listOf("A", "C"))))
+            assertTrue(cfg.rules.contains(Rule("C", listOf(Epsilon))))
         }
     }
 
     companion object {
         fun CFGEps() = ContextFreeGrammar.fromStrings(
-            arrayOf(
+            listOf(
                 "S A B C d",
                 "A a", "A eps",
                 "B A C",
@@ -278,7 +278,7 @@ internal class ContextFreeGrammarTest {
         )
 
         fun CFGEpsSmall() = ContextFreeGrammar.fromStrings(
-            arrayOf(
+            listOf(
                 "S S0 d",
                 "S0 S1 C",
                 "S1 A B",
@@ -289,7 +289,7 @@ internal class ContextFreeGrammarTest {
         )
 
         fun CFGEpsReduced() = ContextFreeGrammar.fromStrings(
-            arrayOf(
+            listOf(
                 "S S0 d", "S d",
                 "S0 S1 C", "S0 C", "S0 S1",
                 "S1 A B", "S1 A", "S1 B",
@@ -300,7 +300,7 @@ internal class ContextFreeGrammarTest {
         )
 
         fun CFGUnitReduced() = ContextFreeGrammar.fromStrings(
-            arrayOf(
+            listOf(
                 "S S0 d", "S d",
                 "S0 S1 C", "S0 c", "S0 A B", "S0 a", "S0 c", "S0 A C",
                 "S1 A B", "S1 a", "S1 A C", "S1 c",

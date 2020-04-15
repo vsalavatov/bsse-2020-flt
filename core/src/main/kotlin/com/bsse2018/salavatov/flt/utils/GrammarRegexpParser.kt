@@ -4,41 +4,9 @@ class GrammarRegexpInvalidFormatException(desc: String) : Exception("Invalid gra
 
 sealed class GrammarRegexpNode
 data class GRNDeclaration(val from: String, val rhs: GrammarRegexpNode) : GrammarRegexpNode()
-data class GRNSequence(val sequence: Array<GrammarRegexpNode>) : GrammarRegexpNode() {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as GRNSequence
-
-        if (!sequence.contentEquals(other.sequence)) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return sequence.contentHashCode()
-    }
-}
-
+data class GRNSequence(val sequence: List<GrammarRegexpNode>) : GrammarRegexpNode()
 data class GRNStar(val nested: GrammarRegexpNode) : GrammarRegexpNode()
-data class GRNAlternatives(val alternatives: Array<GrammarRegexpNode>) : GrammarRegexpNode() {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as GRNAlternatives
-
-        if (!alternatives.contentEquals(other.alternatives)) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return alternatives.contentHashCode()
-    }
-}
-
+data class GRNAlternatives(val alternatives: List<GrammarRegexpNode>) : GrammarRegexpNode()
 data class GRNUnit(val to: String) : GrammarRegexpNode()
 
 object GrammarRegexpParser {
@@ -99,7 +67,7 @@ object GrammarRegexpParser {
                     }
                 }
                 alternatives.add(parse(rhs.substring(left, rhs.length)))
-                return GRNAlternatives(alternatives.toTypedArray())
+                return GRNAlternatives(alternatives)
             }
             rhs.contains(" ") -> {
                 val sequence = ArrayList<GrammarRegexpNode>()
@@ -114,7 +82,7 @@ object GrammarRegexpParser {
                     }
                 }
                 sequence.add(parse(rhs.substring(left, rhs.length)))
-                return GRNSequence(sequence.toTypedArray())
+                return GRNSequence(sequence)
             }
             else -> {
                 return GRNUnit(rhs)

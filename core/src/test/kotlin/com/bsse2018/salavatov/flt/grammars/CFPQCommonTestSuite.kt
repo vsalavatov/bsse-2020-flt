@@ -9,14 +9,14 @@ abstract class CFPQCommonTestSuite {
 
     @Test
     fun `correct bracket sequence`() {
-        val graph = arrayOf(
-            arrayOf(Pair("a", 1)),
-            arrayOf(Pair("a", 2), Pair("b", 5)),
-            arrayOf(Pair("b", 3), Pair("b", 5)),
-            arrayOf(Pair("b", 4), Pair("a", 6)),
-            arrayOf(),
-            arrayOf(),
-            arrayOf(Pair("b", 0))
+        val graph = listOf(
+            listOf(Pair("a", 1)),
+            listOf(Pair("a", 2), Pair("b", 5)),
+            listOf(Pair("b", 3), Pair("b", 5)),
+            listOf(Pair("b", 4), Pair("a", 6)),
+            listOf(),
+            listOf(),
+            listOf(Pair("b", 0))
         )
         val grammar = TestDataCollection.correctBracketSequenceGrammar().toWeakChomskyNormalForm()
         Assertions.assertEquals(
@@ -32,14 +32,14 @@ abstract class CFPQCommonTestSuite {
 
     @Test
     fun `correct bracket sequence ambiguous`() {
-        val graph = arrayOf(
-            arrayOf(Pair("a", 1)),
-            arrayOf(Pair("a", 2), Pair("b", 5)),
-            arrayOf(Pair("b", 3), Pair("b", 5)),
-            arrayOf(Pair("b", 4), Pair("a", 6)),
-            arrayOf(),
-            arrayOf(),
-            arrayOf(Pair("b", 0))
+        val graph = listOf(
+            listOf(Pair("a", 1)),
+            listOf(Pair("a", 2), Pair("b", 5)),
+            listOf(Pair("b", 3), Pair("b", 5)),
+            listOf(Pair("b", 4), Pair("a", 6)),
+            listOf(),
+            listOf(),
+            listOf(Pair("b", 0))
         )
         val grammar = TestDataCollection.correctBracketSequenceAmbiguousGrammar().toWeakChomskyNormalForm()
         Assertions.assertEquals(
@@ -65,7 +65,7 @@ abstract class CFPQCommonTestSuite {
 
     @Test
     fun `empty graph`() {
-        val graph = arrayOf<Array<Pair<String, Int>>>()
+        val graph = listOf<List<Pair<String, Int>>>()
         val grammar = TestDataCollection.correctBracketSequenceGrammar().toWeakChomskyNormalForm()
         Assertions.assertEquals(
             hashSetOf<Pair<Int, Int>>(),
@@ -75,17 +75,17 @@ abstract class CFPQCommonTestSuite {
 
     @Test
     fun multigraph() {
-        val graph = arrayOf(
-            arrayOf(Pair("a", 1), Pair("a", 1), Pair("b", 1)),
-            arrayOf(Pair("a", 2), Pair("b", 5)),
-            arrayOf(Pair("b", 3), Pair("b", 5)),
-            arrayOf(Pair("b", 4), Pair("a", 6)),
-            arrayOf(Pair("a", 4), Pair("b", 7)),
-            arrayOf(),
-            arrayOf(Pair("b", 0)),
-            arrayOf(Pair("b", 8)),
-            arrayOf(Pair("b", 9)),
-            arrayOf()
+        val graph = listOf(
+            listOf(Pair("a", 1), Pair("a", 1), Pair("b", 1)),
+            listOf(Pair("a", 2), Pair("b", 5)),
+            listOf(Pair("b", 3), Pair("b", 5)),
+            listOf(Pair("b", 4), Pair("a", 6)),
+            listOf(Pair("a", 4), Pair("b", 7)),
+            listOf(),
+            listOf(Pair("b", 0)),
+            listOf(Pair("b", 8)),
+            listOf(Pair("b", 9)),
+            listOf()
         )
         val grammar = TestDataCollection.correctBracketSequenceAmbiguousGrammar().toWeakChomskyNormalForm()
         Assertions.assertEquals(
@@ -103,16 +103,16 @@ abstract class CFPQCommonTestSuite {
 
     @Test
     fun `inherently ambiguous grammar`() {
-        val graph = arrayOf(
-            arrayOf(Pair("a", 2), Pair("b", 1)),
-            arrayOf(),
-            arrayOf(Pair("a", 2), Pair("b", 3)),
-            arrayOf(Pair("b", 4)),
-            arrayOf(Pair("c", 5)),
-            arrayOf(Pair("c", 6), Pair("d", 8)),
-            arrayOf(Pair("d", 7)),
-            arrayOf(),
-            arrayOf()
+        val graph = listOf(
+            listOf(Pair("a", 2), Pair("b", 1)),
+            listOf(),
+            listOf(Pair("a", 2), Pair("b", 3)),
+            listOf(Pair("b", 4)),
+            listOf(Pair("c", 5)),
+            listOf(Pair("c", 6), Pair("d", 8)),
+            listOf(Pair("d", 7)),
+            listOf(),
+            listOf()
         )
         val grammar = TestDataCollection.inherentlyAmbiguousGrammar().toWeakChomskyNormalForm()
         Assertions.assertEquals(

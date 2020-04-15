@@ -11,10 +11,10 @@ internal class GrammarRegexpParserTest {
             GRNDeclaration(
                 "S",
                 GRNAlternatives(
-                    arrayOf(
+                    listOf(
                         GRNStar(
                             GRNSequence(
-                                arrayOf(
+                                listOf(
                                     GRNUnit("a"), GRNUnit("S"), GRNUnit("b")
                                 )
                             )
@@ -42,9 +42,9 @@ internal class GrammarRegexpParserTest {
         assertEquals(
             GRNDeclaration(
                 "S", GRNAlternatives(
-                    arrayOf(
-                        GRNStar(GRNSequence(arrayOf(GRNUnit("a"), GRNUnit("b")))),
-                        GRNAlternatives(arrayOf(GRNUnit("S"), GRNUnit("eps"))),
+                    listOf(
+                        GRNStar(GRNSequence(listOf(GRNUnit("a"), GRNUnit("b")))),
+                        GRNAlternatives(listOf(GRNUnit("S"), GRNUnit("eps"))),
                         GRNStar(GRNUnit("S"))
                     )
                 )
