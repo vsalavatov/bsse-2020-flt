@@ -32,3 +32,13 @@ fun graphFromStrings(desc: List<String>): Graph {
     }
     return graph
 }
+
+fun Graph.toAdjacencyMatrix(): List<List<Set<String>>> {
+    val result = List(size) { List(size) { mutableSetOf<String>() } }
+    forEachIndexed { u, edges ->
+        edges.forEach { (sym, v) ->
+            result[u][v].add(sym)
+        }
+    }
+    return result
+}
