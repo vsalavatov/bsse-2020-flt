@@ -1,7 +1,9 @@
 package com.bsse2018.salavatov.flt.automata
 
 import com.bsse2018.salavatov.flt.grammars.ContextFreeGrammar.Companion.Epsilon
+import com.bsse2018.salavatov.flt.grammars.ContextFreeGrammar.Companion.isNonTerminal
 import com.bsse2018.salavatov.flt.utils.*
+import java.util.*
 
 data class PushDownAutomaton(
     val automaton: Graph,
@@ -9,6 +11,78 @@ data class PushDownAutomaton(
     val finishStates: Map<String, List<Int>>,
     val start: String
 ) {
+
+    val symbols: Set<String>
+        get() {
+            val result = mutableSetOf<String>()
+            automaton.forEach { edges ->
+                edges.forEach { (sym, _) ->
+                    if (sym != Epsilon) result.add(sym)
+                }
+            }
+            startStates.forEach { (nonTerm, _) ->
+                result.add(nonTerm)
+            }
+            return result
+        }
+
+    fun epsilonProducers(): Set<String> {
+        val epsProducing = mutableSetOf<String>()
+        val dependants = mutableMapOf<String, MutableSet<String>>()
+
+        val enqueued = mutableSetOf<String>()
+        val queue = LinkedList<String>()
+
+        startStates.forEach {
+            queue.add(it.key)
+            enqueued.add(it.key)
+        }
+
+        while (queue.isNotEmpty()) {
+            val curNonTerm = queue.pop()
+            enqueued.remove(curNonTerm)
+            if (epsProducing.contains(curNonTerm)) continue
+
+            val start = startStates[curNonTerm] ?: continue
+            val bfs = LinkedList<Int>()
+            val visited = Array<Boolean>(automaton.size) { false }
+            bfs.add(start)
+            visited[start] = true
+            while (bfs.isNotEmpty()) {
+                val v = bfs.pop()
+                automaton[v]
+                    .filter {
+                        it.first == Epsilon || (isNonTerminal(it.first) && epsProducing.contains(it.first))
+                    }
+                    .forEach { (_, to) ->
+                        if (!visited[to]) {
+                            bfs.add(to)
+                            visited[to] = true
+                        }
+                    }
+                automaton[v]
+                    .filter {
+                        isNonTerminal(it.first) && !epsProducing.contains(it.first)
+                    }
+                    .forEach {
+                        dependants.getOrPut(it.first, { mutableSetOf() }).add(curNonTerm)
+                    }
+            }
+            if (finishStates[curNonTerm]?.any { visited[it] } == true) {
+                epsProducing.add(curNonTerm)
+                dependants[curNonTerm]?.forEach {
+                    if (!enqueued.contains(it)) {
+                        queue.add(it)
+                        enqueued.add(it)
+                    }
+                }
+                dependants.remove(curNonTerm)
+            }
+        }
+
+        return epsProducing
+    }
+
     companion object {
         fun fromStrings(desc: List<String>): PushDownAutomaton {
             return PDABuilder().apply {
@@ -29,8 +103,8 @@ internal class PDABuilder {
         if (start == "")
             start = st.from
         insert(
-            startStates.getOrPut(start, ::newNode),
-            finishStates.getOrPut(start, ::newNode),
+            startStates.getOrPut(st.from, ::newNode),
+            finishStates.getOrPut(st.from, ::newNode),
             st.rhs
         )
         return this
