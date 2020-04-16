@@ -3,6 +3,7 @@ package com.bsse2018.salavatov.flt.grammars
 import com.bsse2018.salavatov.flt.automata.PushDownAutomaton
 import com.bsse2018.salavatov.flt.grammars.ContextFreeGrammar.Companion.Epsilon
 import com.bsse2018.salavatov.flt.utils.Graph
+import org.la4j.Matrix
 import org.la4j.matrix.SparseMatrix
 import org.la4j.matrix.sparse.CRSMatrix
 import java.util.*
@@ -12,7 +13,10 @@ fun CFPQTensorQuery(graph: Graph, grammar: PushDownAutomaton): Set<Pair<Int, Int
     val graphSize = graph.size
 
     val symbols = grammar.symbols
-    val epsilonProducers = grammar.epsilonProducers()
+    val epsEdges = grammar.automaton.mapIndexed { u, edges ->
+        edges.filter { it.first == Epsilon }
+            .map { Pair(u, it.second) }
+    }.flatten()
 
     val grammarMatrices = mutableMapOf<String, SparseMatrix>()
     val graphMatrices = mutableMapOf<String, SparseMatrix>()
@@ -40,11 +44,6 @@ fun CFPQTensorQuery(graph: Graph, grammar: PushDownAutomaton): Set<Pair<Int, Int
             graphMatrices[sym]!![u, v] = 1.0
         }
     }
-    epsilonProducers.forEach { term ->
-        for (v in graph.indices) {
-            graphMatrices[term]!![v, v] = 1.0
-        }
-    }
 
     do {
         var changed = false
@@ -55,7 +54,12 @@ fun CFPQTensorQuery(graph: Graph, grammar: PushDownAutomaton): Set<Pair<Int, Int
                 totalProduct[i, j] = 1.0
             }
         }
-        val tc = transitiveClosure(totalProduct)
+        epsEdges.forEach { (u, v) ->
+            graph.indices.forEach { grU ->
+                totalProduct[u * graphSize + grU, v * graphSize + grU] = 1.0
+            }
+        }
+        val tc = transitiveClosurePow(totalProduct)
         tc.eachNonZero { i, j, _ ->
             val grammarU = i / graphSize
             val grammarV = j / graphSize
@@ -76,6 +80,10 @@ fun CFPQTensorQuery(graph: Graph, grammar: PushDownAutomaton): Set<Pair<Int, Int
         result.add(i to j)
     }
     return result
+}
+
+private fun transitiveClosurePow(matrix: CRSMatrix): SparseMatrix {
+    return matrix.add(Matrix.identity(matrix.columns())).power(matrix.columns()).toSparseMatrix()
 }
 
 private fun transitiveClosure(matrix: CRSMatrix): CRSMatrix {

@@ -23,4 +23,23 @@ internal class CFPQTensorTest : CFPQCommonTestSuite() {
             CFPQTensorQuery(TestDataCollection.CYKWorstCaseGraph(), pda)
         )
     }
+
+    @Test
+    fun `full graph`() {
+        val pda = PushDownAutomaton.fromStrings(
+            listOf(
+                "S a*"
+            )
+        )
+        val graph = listOf(
+            listOf("a" to 1, "a" to 2),
+            listOf("a" to 2, "a" to 3),
+            listOf("a" to 3, "a" to 0),
+            listOf("a" to 0, "a" to 1)
+        )
+        assertEquals(
+            16,
+            CFPQTensorQuery(graph, pda).size
+        )
+    }
 }
