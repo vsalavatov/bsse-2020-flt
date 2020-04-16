@@ -1,6 +1,5 @@
 plugins {
     application
-    id("com.github.johnrengelman.shadow") version "5.2.0"
 }
 
 dependencies {
