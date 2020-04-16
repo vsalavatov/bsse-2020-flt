@@ -49,9 +49,12 @@ fun CFPQTensorQuery(graph: Graph, grammar: PushDownAutomaton): Set<Pair<Int, Int
         var changed = false
         val totalProduct = CRSMatrix(grammarSize * graphSize, grammarSize * graphSize)
         symbols.forEach { sym ->
-            val product = grammarMatrices[sym]!!.kroneckerProduct(graphMatrices[sym]!!).toSparseMatrix()
-            product.eachNonZero { i, j, _ ->
-                totalProduct[i, j] = 1.0
+            val gramMt = grammarMatrices[sym]!!
+            val graphMt = graphMatrices[sym]!!
+            gramMt.eachNonZero { i, j, _ ->
+                graphMt.eachNonZero { u, v, _ ->
+                    totalProduct[i * graphSize + u, j * graphSize + v] = 1.0
+                }
             }
         }
         epsEdges.forEach { (u, v) ->
@@ -59,7 +62,7 @@ fun CFPQTensorQuery(graph: Graph, grammar: PushDownAutomaton): Set<Pair<Int, Int
                 totalProduct[u * graphSize + grU, v * graphSize + grU] = 1.0
             }
         }
-        val tc = transitiveClosurePow(totalProduct)
+        val tc = transitiveClosure(totalProduct)
         tc.eachNonZero { i, j, _ ->
             val grammarU = i / graphSize
             val grammarV = j / graphSize
@@ -83,7 +86,7 @@ fun CFPQTensorQuery(graph: Graph, grammar: PushDownAutomaton): Set<Pair<Int, Int
 }
 
 private fun transitiveClosurePow(matrix: CRSMatrix): SparseMatrix {
-    return matrix.add(Matrix.identity(matrix.columns())).power(matrix.columns()).toSparseMatrix()
+    return matrix.add(CRSMatrix.identity(matrix.columns())).power(matrix.columns()).toSparseMatrix()
 }
 
 private fun transitiveClosure(matrix: CRSMatrix): CRSMatrix {
