@@ -79,7 +79,12 @@ fun runConfiguration(
     val prepared = handler(grammarDesc, graph)
 
     // heat up JIT
-    val result = prepared()
+    var result: Set<Pair<Int, Int>>? = null
+    val duration = measureTime {
+        result = prepared()
+    }
+    if (duration.inSeconds > 5.0)
+        StatusLine.log("heated (${duration.inSeconds}s)")
     result ?: return null
 
     val durations = (1..samples).map {
@@ -96,7 +101,7 @@ fun runConfiguration(
 
     return Pair(
         durations.sumByDouble { it.inSeconds }.div(samples),
-        result.size
+        result!!.size
     )
 }
 
@@ -108,7 +113,9 @@ fun runBenchmark(path: String, reportDestination: String, graphOrder: (String) -
     val grammarsFolder = File("$path/grammars")
     val graphsFolder = File("$path/graphs")
 
-    val grammars = grammarsFolder.list()!!.sorted()
+    val grammars = grammarsFolder.list()!!
+        .filter { !it.startsWith("!") }
+        .sorted()
     val graphs = graphsFolder.list()!!
         .filter { !it.startsWith("!") }
         .sortedBy(graphOrder)
@@ -165,6 +172,10 @@ fun runBenchmark(path: String, reportDestination: String, graphOrder: (String) -
                 }
 
                 doneActions++
+                StatusLine.statusLine(
+                    doneActions.toDouble() / totalActions,
+                    "$graphFilename - ${subject.name} - $grammarFilename"
+                )
             }
         }
         reportFile.appendText("\n")
@@ -173,19 +184,38 @@ fun runBenchmark(path: String, reportDestination: String, graphOrder: (String) -
 
 @ExperimentalTime
 fun main(args: Array<String>) {
-    if (args.size != 2) {
-        println("Arguments: <path to benchmark dataset> <where to put report csv's>")
+    if (args.size < 4) {
+        println("Arguments: <path to benchmark dataset> <where to put report csv's> <dataset name> <algorithms... from {Hellings, Matrix, Tensor}>")
         return
     }
     val datasetPath = args[0]
     val reportDestination = args[1]
+    val tests = listOf(args[2])
 
-    subjects = subjects.filter { it.name in listOf("Hellings", "Matrix", "Tensor") }
-    val tests = listOf("FullGraph")
-    val ordering = { str: String ->
-        val num = str.substring("fullgraph_".length)
-        num.toDouble()
-    }
+    subjects = subjects.filter { it.name in args.drop(3) }
+    val ordering = mapOf(
+        "FullGraph" to { str: String ->
+            val num = str.substring("fullgraph_".length)
+            num.toDouble()
+        },
+        "SparseGraph" to { str: String ->
+            val num = str.substring(1).split("k-")
+            num.map {
+                try {
+                    it.toDouble()
+                } catch (e: Exception) {
+                    0.0
+                }
+            }.sum()
+        },
+        "WorstCase" to { str: String ->
+            val num = str.substring("worstcase_".length)
+            num.toDouble()
+        },
+        "MemoryAliases" to { str: String ->
+            str.hashCode().toDouble()
+        }
+    )
 
     println("CFPQ algorithms benchmark tool")
     println()
@@ -193,7 +223,7 @@ fun main(args: Array<String>) {
     println()
 
     tests.forEach {
-        runBenchmark("$datasetPath/$it", reportDestination, ordering)
+        runBenchmark("$datasetPath/$it", reportDestination, ordering[it] ?: error("Unknown dataset"))
         println()
     } ?: println("No data found...")
 }
