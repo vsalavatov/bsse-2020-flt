@@ -1,10 +1,11 @@
 package com.bsse2018.salavatov.flt.grammars
 
+import com.bsse2018.salavatov.flt.utils.Graph
 import java.util.*
-import kotlin.collections.HashSet
+import kotlin.collections.MutableSet
 
-fun HellingsQuery(graph: Array<Array<Pair<String, Int>>>, wcnf: ContextFreeGrammar): HashSet<Pair<Int, Int>> {
-    val dp = Array(graph.size) { Array(graph.size) { hashSetOf<String>() } }
+fun HellingsQuery(graph: Graph, wcnf: ContextFreeGrammar): MutableSet<Pair<Int, Int>> {
+    val dp = List(graph.size) { List(graph.size) { mutableSetOf<String>() } }
     val queue = ArrayDeque<Triple<String, Int, Int>>()
     val epsilonRules = wcnf.rules.filter { it.isEpsilon() }
     val symRules = wcnf.rules.filter { it.isTerminal() }
@@ -31,10 +32,10 @@ fun HellingsQuery(graph: Array<Array<Pair<String, Int>>>, wcnf: ContextFreeGramm
     while (queue.isNotEmpty()) {
         val (nonTerm, u, v) = queue.pop()
         for (ufrom in dp.indices) {
-            val postponedAdd = hashSetOf<String>()
+            val postponedAdd = mutableSetOf<String>()
             dp[ufrom][u].forEach { nonTermBefore ->
                 wcnf.rules
-                    .filter { it.to.contentEquals(arrayOf(nonTermBefore, nonTerm)) }
+                    .filter { it.to == listOf(nonTermBefore, nonTerm) }
                     .forEach { rule ->
                         if (!dp[ufrom][v].contains(rule.from) && !postponedAdd.contains(rule.from)) {
                             postponedAdd.add(rule.from)
@@ -45,10 +46,10 @@ fun HellingsQuery(graph: Array<Array<Pair<String, Int>>>, wcnf: ContextFreeGramm
             dp[ufrom][v].addAll(postponedAdd)
         }
         for (vto in dp.indices) {
-            val postponedAdd = hashSetOf<String>()
+            val postponedAdd = mutableSetOf<String>()
             dp[v][vto].forEach { nonTermAfter ->
                 wcnf.rules
-                    .filter { it.to.contentEquals(arrayOf(nonTerm, nonTermAfter)) }
+                    .filter { it.to == listOf(nonTerm, nonTermAfter) }
                     .forEach { rule ->
                         if (!dp[u][vto].contains(rule.from) && !postponedAdd.contains(rule.from)) {
                             postponedAdd.add(rule.from)
@@ -60,7 +61,7 @@ fun HellingsQuery(graph: Array<Array<Pair<String, Int>>>, wcnf: ContextFreeGramm
         }
     }
 
-    val result = hashSetOf<Pair<Int, Int>>()
+    val result = mutableSetOf<Pair<Int, Int>>()
     for (u in dp.indices) {
         for (v in dp.indices) {
             if (dp[u][v].contains(wcnf.start))

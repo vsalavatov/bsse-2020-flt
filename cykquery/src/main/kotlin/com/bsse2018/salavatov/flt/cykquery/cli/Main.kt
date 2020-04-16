@@ -11,7 +11,7 @@ fun main(args: Array<String>) {
         println("Arguments: <grammar file> <query file>")
         return
     }
-    val rawGrammar = File(args[0]).readLines().filter { it.isNotEmpty() }.toTypedArray()
+    val rawGrammar = File(args[0]).readLines().filter { it.isNotEmpty() }
     val grammar = ContextFreeGrammar.fromStrings(rawGrammar)
     val query = File(args[1]).readLines().getOrElse(0) { "" }.trim()
     try {

@@ -1,9 +1,10 @@
 package com.bsse2018.salavatov.flt.grammars
 
+import com.bsse2018.salavatov.flt.utils.Graph
 import org.la4j.matrix.SparseMatrix
 import org.la4j.matrix.sparse.CRSMatrix
 
-fun CFPQMatrixQuery(graph: Array<Array<Pair<String, Int>>>, wcnf: ContextFreeGrammar): HashSet<Pair<Int, Int>> {
+fun CFPQMatrixQuery(graph: Graph, wcnf: ContextFreeGrammar): HashSet<Pair<Int, Int>> {
     val nonTerminals = ContextFreeGrammar.NodeAccountant().let {
         it.consume(wcnf)
         it.nonTerminals

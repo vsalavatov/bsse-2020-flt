@@ -4,10 +4,10 @@ import com.bsse2018.salavatov.flt.grammars.ContextFreeGrammar.Companion.Epsilon
 
 fun CYKQuery(cnfGrammar: ContextFreeGrammar, query: String): Boolean {
     if (query.isEmpty()) {
-        return cnfGrammar.rules.contains(ContextFreeGrammar.Rule(cnfGrammar.start, arrayOf(Epsilon)))
+        return cnfGrammar.rules.contains(ContextFreeGrammar.Rule(cnfGrammar.start, listOf(Epsilon)))
     }
 
-    val dp = Array<Array<HashSet<String>>>(query.length) { Array(query.length + 1) { hashSetOf<String>() } }
+    val dp = List<List<HashSet<String>>>(query.length) { List(query.length + 1) { hashSetOf<String>() } }
 
     val symRules = cnfGrammar.rules.filter { it.isTerminal() && !it.to.contains(Epsilon) }
     val concatRules = cnfGrammar.rules.filter { !it.isTerminal() }

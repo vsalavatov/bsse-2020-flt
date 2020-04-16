@@ -2,9 +2,12 @@ package com.bsse2018.salavatov.flt.utils
 
 import java.lang.Exception
 
+typealias Graph = List<List<Pair<String, Int>>>
+typealias MutableGraph = MutableList<MutableList<Pair<String, Int>>>
+
 class GraphInvalidFormatException(desc: String) : Exception("Invalid graph format: $desc")
 
-fun graphFromStrings(desc: Array<String>): Array<Array<Pair<String, Int>>> {
+fun graphFromStrings(desc: List<String>): Graph {
     val triples = desc.map {
         val tokens = it.trim().split(Regex("\\s+"))
         if (tokens.size != 3) {
@@ -23,9 +26,19 @@ fun graphFromStrings(desc: Array<String>): Array<Array<Pair<String, Int>>> {
     triples.forEach {
         maxV = maxOf(maxV, it.first, it.third)
     }
-    val graph = Array(maxV + 1) { arrayListOf<Pair<String, Int>>() }
+    val graph = List(maxV + 1) { mutableListOf<Pair<String, Int>>() }
     triples.forEach {
         graph[it.first].add(Pair(it.second, it.third))
     }
-    return graph.map { it.toTypedArray() }.toTypedArray()
+    return graph
+}
+
+fun Graph.toAdjacencyMatrix(): List<List<Set<String>>> {
+    val result = List(size) { List(size) { mutableSetOf<String>() } }
+    forEachIndexed { u, edges ->
+        edges.forEach { (sym, v) ->
+            result[u][v].add(sym)
+        }
+    }
+    return result
 }

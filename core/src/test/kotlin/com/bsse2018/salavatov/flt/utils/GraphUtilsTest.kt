@@ -7,17 +7,17 @@ import org.junit.jupiter.api.Assertions.*
 internal class GraphUtilsTest {
     @Test
     fun graphFromStrings() {
-        assertArrayEquals(
-            graphFromStrings(arrayOf("0 a 1", "1 b 2")),
-            arrayOf(
-                arrayOf(Pair("a", 1)),
-                arrayOf(Pair("b", 2)),
-                arrayOf()
+        assertEquals(
+            graphFromStrings(listOf("0 a 1", "1 b 2")),
+            listOf(
+                listOf(Pair("a", 1)),
+                listOf(Pair("b", 2)),
+                listOf()
             )
         )
 
-        assertThrows(GraphInvalidFormatException::class.java) { graphFromStrings(arrayOf("asdasd")) }
-        assertThrows(GraphInvalidFormatException::class.java) { graphFromStrings(arrayOf("1 a ")) }
-        assertThrows(GraphInvalidFormatException::class.java) { graphFromStrings(arrayOf("A b C")) }
+        assertThrows(GraphInvalidFormatException::class.java) { graphFromStrings(listOf("asdasd")) }
+        assertThrows(GraphInvalidFormatException::class.java) { graphFromStrings(listOf("1 a ")) }
+        assertThrows(GraphInvalidFormatException::class.java) { graphFromStrings(listOf("A b C")) }
     }
 }

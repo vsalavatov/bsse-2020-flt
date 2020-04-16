@@ -1,48 +1,33 @@
 package com.bsse2018.salavatov.flt.grammars
 
 import java.util.*
-import kotlin.collections.HashSet
+import kotlin.collections.MutableSet
 
 class EmptyLanguageException : Exception("Grammar is not habitable")
 class InvalidFormatException(desc: String) : Exception("Invalid format: $desc")
 
-class ContextFreeGrammar(val start: String, rules_: HashSet<Rule>) {
-    val rules: HashSet<Rule> = hashSetOf<Rule>()
+class ContextFreeGrammar(val start: String, rules_: MutableSet<Rule>) {
+    val rules: MutableSet<Rule> = mutableSetOf<Rule>()
 
     init {
         for (rule_ in rules_) {
             rules.add(Rule(
                 rule_.from,
                 rule_.to
-                    .filterNot { it == Epsilon }.toTypedArray()
-                    .ifEmpty { arrayOf(Epsilon) }
+                    .filterNot { it == Epsilon }
+                    .ifEmpty { listOf(Epsilon) }
             ))
         }
     }
 
-    data class Rule(val from: String, val to: Array<String>) {
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (javaClass != other?.javaClass) return false
-            other as Rule
-            if (from != other.from) return false
-            if (!to.contentEquals(other.to)) return false
-            return true
-        }
-
-        override fun hashCode(): Int {
-            var result = from.hashCode()
-            result = 31 * result + to.contentHashCode()
-            return result
-        }
-
+    data class Rule(val from: String, val to: List<String>) {
         fun isEpsilon() = to.size == 1 && to[0] == Epsilon
         fun isUnit() = to.size == 1 && isNonTerminal(to[0])
         fun isTerminal() = to.all { isTerminal(it) }
     }
 
     class NodeAccountant {
-        val nonTerminals = hashSetOf<String>()
+        val nonTerminals = mutableSetOf<String>()
         private var index = 0
 
         fun consume(node: String) {
@@ -75,27 +60,29 @@ class ContextFreeGrammar(val start: String, rules_: HashSet<Rule>) {
     fun shrinkLongRules(): ContextFreeGrammar {
         val accountant = NodeAccountant()
         accountant.consume(this)
-        val newRules = hashSetOf<Rule>()
+        val newRules = mutableSetOf<Rule>()
         rules.forEach { rule ->
-            val rhs = rule.to.copyOf().toMutableList()
+            val rhs = mutableListOf<String>().apply {
+                addAll(rule.to)
+            }
             var lhs = rule.from
             while (rhs.size > 2) {
                 val fresh = accountant.freshNonTerminal()
-                newRules.add(Rule(lhs, arrayOf(fresh, rhs.last())))
+                newRules.add(Rule(lhs, listOf(fresh, rhs.last())))
                 rhs.removeAt(rhs.size - 1)
                 lhs = fresh
             }
-            newRules.add(Rule(lhs, rhs.toTypedArray()))
+            newRules.add(Rule(lhs, rhs))
         }
         return ContextFreeGrammar(start, newRules)
     }
 
     fun hasOnlySmallRules(): Boolean = rules.all { it.to.size <= 2 }
 
-    fun epsilonProducers(): HashSet<String> {
+    fun epsilonProducers(): MutableSet<String> {
         val produceEps = hashMapOf<String, Boolean>()
-        val concernedRules = hashMapOf<String, HashSet<Rule>>()
-        val nonProducingNonTerminals = hashMapOf<Rule, HashSet<String>>()
+        val concernedRules = hashMapOf<String, MutableSet<Rule>>()
+        val nonProducingNonTerminals = hashMapOf<Rule, MutableSet<String>>()
 
         produceEps[start] = false
         rules.forEach { rule ->
@@ -103,10 +90,10 @@ class ContextFreeGrammar(val start: String, rules_: HashSet<Rule>) {
             rule.to.forEach { elem ->
                 if (isNonTerminal(elem)) {
                     produceEps[elem] = false
-                    concernedRules.getOrPut(elem, { hashSetOf() }).add(rule)
+                    concernedRules.getOrPut(elem, { mutableSetOf() }).add(rule)
                 }
                 // add even a terminal node so that we won't mark that rule eps-producing
-                nonProducingNonTerminals.getOrPut(rule, { hashSetOf() }).add(elem)
+                nonProducingNonTerminals.getOrPut(rule, { mutableSetOf() }).add(elem)
             }
         }
 
@@ -136,7 +123,7 @@ class ContextFreeGrammar(val start: String, rules_: HashSet<Rule>) {
             }
         }
 
-        return produceEps.filter { it.value }.keys.toHashSet()
+        return produceEps.filter { it.value }.keys.toMutableSet()
     }
 
     fun reduceEpsilonRules(): ContextFreeGrammar {
@@ -145,7 +132,7 @@ class ContextFreeGrammar(val start: String, rules_: HashSet<Rule>) {
 
         val epsilonProducers = epsilonProducers()
         var newStart = start
-        val newRules = hashSetOf<Rule>()
+        val newRules = mutableSetOf<Rule>()
 
         rules.forEach { rule ->
             if (!rule.isEpsilon()) { // drop all eps-rules
@@ -155,10 +142,10 @@ class ContextFreeGrammar(val start: String, rules_: HashSet<Rule>) {
                 } else {
                     assert(rhs.size == 2)
                     if (epsilonProducers.contains(rhs[0])) {
-                        newRules.add(Rule(rule.from, arrayOf(rhs[1])))
+                        newRules.add(Rule(rule.from, listOf(rhs[1])))
                     }
                     if (epsilonProducers.contains(rhs[1])) {
-                        newRules.add(Rule(rule.from, arrayOf(rhs[0])))
+                        newRules.add(Rule(rule.from, listOf(rhs[0])))
                     }
                     newRules.add(rule.copy())
                 }
@@ -168,8 +155,8 @@ class ContextFreeGrammar(val start: String, rules_: HashSet<Rule>) {
             val accountant = NodeAccountant()
             accountant.consume(this)
             newStart = accountant.freshNonTerminal()
-            newRules.add(Rule(newStart, arrayOf(Epsilon)))
-            newRules.add(Rule(newStart, arrayOf(start)))
+            newRules.add(Rule(newStart, listOf(Epsilon)))
+            newRules.add(Rule(newStart, listOf(start)))
         }
         return ContextFreeGrammar(newStart, newRules)
     }
@@ -184,15 +171,15 @@ class ContextFreeGrammar(val start: String, rules_: HashSet<Rule>) {
         if (!hasOnlySmallRules())
             return shrinkLongRules().reduceUnitRules()
 
-        val nonUnitRules = hashMapOf<String, ArrayList<Rule>>()
-        val unitRules = hashMapOf<String, ArrayList<Rule>>()
-        val newRules = hashSetOf<Rule>()
+        val nonUnitRules = hashMapOf<String, MutableList<Rule>>()
+        val unitRules = hashMapOf<String, MutableList<Rule>>()
+        val newRules = mutableSetOf<Rule>()
 
         rules.forEach {
             if (!it.isUnit()) {
-                nonUnitRules.getOrPut(it.from, { arrayListOf() }).add(it)
+                nonUnitRules.getOrPut(it.from, { mutableListOf() }).add(it)
             } else {
-                unitRules.getOrPut(it.from, { arrayListOf() }).add(it)
+                unitRules.getOrPut(it.from, { mutableListOf() }).add(it)
             }
         }
 
@@ -200,7 +187,7 @@ class ContextFreeGrammar(val start: String, rules_: HashSet<Rule>) {
         accountant.consume(this)
         accountant.nonTerminals.forEach { origin ->
             val queue = ArrayDeque<String>()
-            val visited = hashSetOf<String>()
+            val visited = mutableSetOf<String>()
             queue.add(origin)
             visited.add(origin)
             while (queue.isNotEmpty()) {
@@ -224,10 +211,10 @@ class ContextFreeGrammar(val start: String, rules_: HashSet<Rule>) {
         return rules.all { !it.isUnit() }
     }
 
-    fun generatingRules(): HashSet<Rule> {
-        val generatingNonTerminals = hashSetOf<String>()
-        val concernedRules = hashMapOf<String, HashSet<Rule>>()
-        val nonGeneratingNonTerminals = hashMapOf<Rule, HashSet<String>>()
+    fun generatingRules(): MutableSet<Rule> {
+        val generatingNonTerminals = mutableSetOf<String>()
+        val concernedRules = hashMapOf<String, MutableSet<Rule>>()
+        val nonGeneratingNonTerminals = hashMapOf<Rule, MutableSet<String>>()
 
         val queue = ArrayDeque<String>()
 
@@ -238,12 +225,12 @@ class ContextFreeGrammar(val start: String, rules_: HashSet<Rule>) {
                     queue.add(rule.from)
                 }
                 // add a rule with empty deps so that we can easily filter wanted rules later
-                nonGeneratingNonTerminals.getOrPut(rule, { hashSetOf() })
+                nonGeneratingNonTerminals.getOrPut(rule, { mutableSetOf() })
             } else {
                 rule.to.filter { isNonTerminal(it) }
                     .forEach {
-                        concernedRules.getOrPut(it, { hashSetOf() }).add(rule)
-                        nonGeneratingNonTerminals.getOrPut(rule, { hashSetOf() }).add(it)
+                        concernedRules.getOrPut(it, { mutableSetOf() }).add(rule)
+                        nonGeneratingNonTerminals.getOrPut(rule, { mutableSetOf() }).add(it)
                     }
             }
         }
@@ -262,7 +249,7 @@ class ContextFreeGrammar(val start: String, rules_: HashSet<Rule>) {
             }
         }
 
-        return nonGeneratingNonTerminals.filter { it.value.isEmpty() }.keys.toHashSet()
+        return nonGeneratingNonTerminals.filter { it.value.isEmpty() }.keys.toMutableSet()
     }
 
     fun reduceNonGeneratingRules(): ContextFreeGrammar {
@@ -274,7 +261,7 @@ class ContextFreeGrammar(val start: String, rules_: HashSet<Rule>) {
 
     fun reduceUnreachable(): ContextFreeGrammar {
         val queue = ArrayDeque<String>()
-        val reachable = hashSetOf<String>()
+        val reachable = mutableSetOf<String>()
         queue.add(start)
         reachable.add(start)
         val graph = rules.groupBy { it.from }
@@ -290,7 +277,7 @@ class ContextFreeGrammar(val start: String, rules_: HashSet<Rule>) {
                     }
             }
         }
-        return ContextFreeGrammar(start, rules.filter { reachable.contains(it.from) }.toHashSet())
+        return ContextFreeGrammar(start, rules.filter { reachable.contains(it.from) }.toMutableSet())
     }
 
     fun reduceLongTerminalRules(): ContextFreeGrammar {
@@ -298,7 +285,7 @@ class ContextFreeGrammar(val start: String, rules_: HashSet<Rule>) {
         accountant.consume(this)
 
         val terminalMapping = hashMapOf<String, String>()
-        val newRules = hashSetOf<Rule>()
+        val newRules = mutableSetOf<Rule>()
 
         rules.forEach { rule ->
             if (rule.to.size >= 2) {
@@ -308,7 +295,7 @@ class ContextFreeGrammar(val start: String, rules_: HashSet<Rule>) {
                 newRules.add(
                     Rule(
                         rule.from,
-                        arrayOf(
+                        listOf(
                             if (isTerminal(s1)) {
                                 terminalMapping.getOrPut(s1, { accountant.freshNonTerminal() })
                             } else {
@@ -327,7 +314,7 @@ class ContextFreeGrammar(val start: String, rules_: HashSet<Rule>) {
             }
         }
         terminalMapping.forEach {
-            newRules.add(Rule(it.value, arrayOf(it.key)))
+            newRules.add(Rule(it.value, listOf(it.key)))
         }
 
         return ContextFreeGrammar(start, newRules)
@@ -339,9 +326,9 @@ class ContextFreeGrammar(val start: String, rules_: HashSet<Rule>) {
             val accountant = NodeAccountant()
             accountant.consume(this)
             val newStart = accountant.freshNonTerminal()
-            val newRules = hashSetOf<Rule>()
+            val newRules = mutableSetOf<Rule>()
             rules.forEach { newRules.add(it.copy()) }
-            newRules.add(Rule(newStart, arrayOf(start)))
+            newRules.add(Rule(newStart, listOf(start)))
             grammar = ContextFreeGrammar(newStart, newRules)
         }
         return grammar
@@ -362,8 +349,8 @@ class ContextFreeGrammar(val start: String, rules_: HashSet<Rule>) {
             .reduceLongTerminalRules()
     }
 
-    fun dumpAsStrings(): Array<String> {
-        val arrRules = rules.toTypedArray()
+    fun dumpAsStrings(): List<String> {
+        val arrRules = rules.toMutableList()
         arrRules.sortBy {
             if (it.from == start) {
                 ""
@@ -371,7 +358,7 @@ class ContextFreeGrammar(val start: String, rules_: HashSet<Rule>) {
                 it.from
             }
         }
-        return arrRules.map { "${it.from} ${it.to.joinToString(" ")}" }.toTypedArray()
+        return arrRules.map { "${it.from} ${it.to.joinToString(" ")}" }
     }
 
     override fun equals(other: Any?): Boolean {
@@ -381,7 +368,7 @@ class ContextFreeGrammar(val start: String, rules_: HashSet<Rule>) {
         other as ContextFreeGrammar
 
         if (start != other.start) return false
-        if (rules.toHashSet() != other.rules.toHashSet()) return false
+        if (rules != other.rules) return false
 
         return true
     }
@@ -406,12 +393,15 @@ class ContextFreeGrammar(val start: String, rules_: HashSet<Rule>) {
                 throw InvalidFormatException("at least 1 token must be presented on rhs")
             if (!isNonTerminal(tokens[0]))
                 throw InvalidFormatException("lhs must be a nonterminal")
-            return Rule(tokens[0], tokens.drop(1).toTypedArray())
+            val rhs = tokens.drop(1)
+            if (rhs.any { !isNonTerminal(it) && !isTerminal(it) })
+                throw InvalidFormatException("unsupported symbol in rhs")
+            return Rule(tokens[0], rhs)
         }
 
-        fun rulesFromStrings(desc: Array<String>) = desc.map(::parseRule).toHashSet()
+        fun rulesFromStrings(desc: List<String>) = desc.map(::parseRule).toMutableSet()
 
-        fun fromStrings(desc: Array<String>): ContextFreeGrammar {
+        fun fromStrings(desc: List<String>): ContextFreeGrammar {
             val rules = rulesFromStrings(desc)
             if (rules.isEmpty())
                 throw EmptyLanguageException()

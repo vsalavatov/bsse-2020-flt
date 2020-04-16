@@ -2,19 +2,19 @@ package com.bsse2018.salavatov.flt.grammars
 
 object TestDataCollection {
     fun correctBracketSequenceGrammar() = ContextFreeGrammar.fromStrings(
-        arrayOf(
+        listOf(
             "S a S b S", "S eps"
         )
     )
 
     fun correctBracketSequenceAmbiguousGrammar() = ContextFreeGrammar.fromStrings(
-        arrayOf(
+        listOf(
             "S eps", "S a S b", "S S S"
         )
     )
 
     fun distinctNumberABGrammar() = ContextFreeGrammar.fromStrings(
-        arrayOf(
+        listOf(
             "S T", "S U",
             "T V a T", "T V a V", "T T a V",
             "U V b U", "U V b V", "U U b V",
@@ -24,7 +24,7 @@ object TestDataCollection {
 
     // { a^n b^m c^m d^n | n,m > 0 } U { a^n b^n c^m d^m | n,m > 0 }
     fun inherentlyAmbiguousGrammar() = ContextFreeGrammar.fromStrings(
-        arrayOf(
+        listOf(
             "S F1", "S F2",
             "F1 a I1 d", "F1 a F1 d",
             "I1 b c", "I1 b I1 c",
@@ -34,15 +34,15 @@ object TestDataCollection {
         )
     )
 
-    fun CYKWorstCaseGraph() = arrayOf(
-        arrayOf(Pair("a", 1)),
-        arrayOf(Pair("a", 2)),
-        arrayOf(Pair("a", 0), Pair("b", 3)),
-        arrayOf(Pair("b", 2))
+    fun CYKWorstCaseGraph() = listOf(
+        listOf(Pair("a", 1)),
+        listOf(Pair("a", 2)),
+        listOf(Pair("a", 0), Pair("b", 3)),
+        listOf(Pair("b", 2))
     )
 
     fun CYKWorstCaseGrammar() = ContextFreeGrammar.fromStrings(
-        arrayOf(
+        listOf(
             "S A B", "S A S1",
             "S1 S B",
             "A a",

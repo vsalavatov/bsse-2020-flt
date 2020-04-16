@@ -11,7 +11,7 @@ fun main(args: Array<String>) {
         return
     }
     try {
-        val rawGrammar = File(args[0]).readLines().filter { it.isNotEmpty() }.toTypedArray()
+        val rawGrammar = File(args[0]).readLines().filter { it.isNotEmpty() }
         val grammar = ContextFreeGrammar.fromStrings(rawGrammar)
         val cnf = grammar.toChomskyNormalForm()
         File(args[1]).writeText(cnf.dumpAsStrings().joinToString("\n"))

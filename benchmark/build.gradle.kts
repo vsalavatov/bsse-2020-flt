@@ -9,7 +9,7 @@ dependencies {
 }
 
 application {
-    mainClassName = "com.bsse2018.salavatov.flt.cykquery.cli.MainKt"
+    mainClassName = "com.bsse2018.salavatov.flt.benchmark.cli.MainKt"
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {

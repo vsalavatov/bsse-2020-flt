@@ -3,5 +3,7 @@ include 'cnfconv'
 include 'cykquery'
 include 'hellings'
 include 'cfpqmatrix'
+include 'cfpqtensor'
+include 'benchmark'
 include 'core'
 
