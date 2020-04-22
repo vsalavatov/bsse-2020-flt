@@ -1,6 +1,6 @@
 package com.bsse2018.salavatov.flt.cykquery.cli
 
-import com.bsse2018.salavatov.flt.grammars.CYKQuery
+import com.bsse2018.salavatov.flt.algorithms.CYKQuery
 import com.bsse2018.salavatov.flt.grammars.ContextFreeGrammar
 import com.bsse2018.salavatov.flt.grammars.EmptyLanguageException
 import java.io.File

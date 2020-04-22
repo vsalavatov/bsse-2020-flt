@@ -1,5 +1,6 @@
 package com.bsse2018.salavatov.flt.grammars
 
+import com.bsse2018.salavatov.flt.algorithms.CYKQuery
 import com.bsse2018.salavatov.flt.grammars.TestDataCollection.correctBracketSequenceAmbiguousGrammar
 import com.bsse2018.salavatov.flt.grammars.TestDataCollection.correctBracketSequenceGrammar
 import com.bsse2018.salavatov.flt.grammars.TestDataCollection.distinctNumberABGrammar

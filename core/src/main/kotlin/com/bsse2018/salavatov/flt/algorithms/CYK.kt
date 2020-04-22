@@ -1,10 +1,16 @@
-package com.bsse2018.salavatov.flt.grammars
+package com.bsse2018.salavatov.flt.algorithms
 
+import com.bsse2018.salavatov.flt.grammars.ContextFreeGrammar
 import com.bsse2018.salavatov.flt.grammars.ContextFreeGrammar.Companion.Epsilon
 
 fun CYKQuery(cnfGrammar: ContextFreeGrammar, query: String): Boolean {
     if (query.isEmpty()) {
-        return cnfGrammar.rules.contains(ContextFreeGrammar.Rule(cnfGrammar.start, listOf(Epsilon)))
+        return cnfGrammar.rules.contains(
+            ContextFreeGrammar.Rule(
+                cnfGrammar.start,
+                listOf(Epsilon)
+            )
+        )
     }
 
     val dp = List<List<HashSet<String>>>(query.length) { List(query.length + 1) { hashSetOf<String>() } }

@@ -1,9 +1,8 @@
-package com.bsse2018.salavatov.flt.grammars
+package com.bsse2018.salavatov.flt.algorithms
 
 import com.bsse2018.salavatov.flt.automata.PushDownAutomaton
 import com.bsse2018.salavatov.flt.grammars.ContextFreeGrammar.Companion.Epsilon
 import com.bsse2018.salavatov.flt.utils.Graph
-import org.la4j.Matrix
 import org.la4j.matrix.SparseMatrix
 import org.la4j.matrix.sparse.CRSMatrix
 import java.util.*
