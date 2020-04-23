@@ -16,7 +16,7 @@ fun main(args: Array<String>) {
     val query = File(args[1]).readLines().getOrElse(0) { "" }.trim()
     try {
         val cnf = grammar.toChomskyNormalForm()
-        println(CYKQuery(cnf, query))
+        println(CYKQuery(cnf, query.map { it.toString() }))
     } catch (e: EmptyLanguageException) {
         println(query == "")
     } catch (e: Exception) {
