@@ -1,10 +1,10 @@
 package com.bsse2018.salavatov.flt.benchmark.cli
 
 import com.bsse2018.salavatov.flt.automata.PushDownAutomaton
-import com.bsse2018.salavatov.flt.grammars.CFPQMatrixQuery
-import com.bsse2018.salavatov.flt.grammars.CFPQTensorQuery
+import com.bsse2018.salavatov.flt.algorithms.CFPQMatrixQuery
+import com.bsse2018.salavatov.flt.algorithms.CFPQTensorQuery
 import com.bsse2018.salavatov.flt.grammars.ContextFreeGrammar
-import com.bsse2018.salavatov.flt.grammars.HellingsQuery
+import com.bsse2018.salavatov.flt.algorithms.HellingsQuery
 import com.bsse2018.salavatov.flt.utils.Graph
 import com.bsse2018.salavatov.flt.utils.graphFromStrings
 import java.io.File
@@ -54,7 +54,12 @@ var subjects = listOf(
     QueryHandler("Matrix") { grammarDesc, graph ->
         try {
             val wcnf = ContextFreeGrammar.fromStrings(grammarDesc).toWeakChomskyNormalForm()
-            return@QueryHandler { CFPQMatrixQuery(graph, wcnf) }
+            return@QueryHandler {
+                CFPQMatrixQuery(
+                    graph,
+                    wcnf
+                )
+            }
         } catch (e: Exception) {
             { null }
         }

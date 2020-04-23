@@ -1,5 +1,6 @@
 package com.bsse2018.salavatov.flt.grammars
 
+import com.bsse2018.salavatov.flt.algorithms.HellingsQuery
 import com.bsse2018.salavatov.flt.utils.Graph
 
 internal class HellingsTest : CFPQCommonTestSuite() {

@@ -1,7 +1,7 @@
 package com.bsse2018.salavatov.flt.cfpqtensor.cli
 
+import com.bsse2018.salavatov.flt.algorithms.CFPQTensorQuery
 import com.bsse2018.salavatov.flt.automata.PushDownAutomaton
-import com.bsse2018.salavatov.flt.grammars.*
 import com.bsse2018.salavatov.flt.utils.graphFromStrings
 import com.bsse2018.salavatov.flt.utils.toAdjacencyMatrix
 import java.io.File

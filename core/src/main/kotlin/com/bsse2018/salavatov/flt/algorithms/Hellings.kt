@@ -1,5 +1,6 @@
-package com.bsse2018.salavatov.flt.grammars
+package com.bsse2018.salavatov.flt.algorithms
 
+import com.bsse2018.salavatov.flt.grammars.ContextFreeGrammar
 import com.bsse2018.salavatov.flt.utils.Graph
 import java.util.*
 import kotlin.collections.MutableSet

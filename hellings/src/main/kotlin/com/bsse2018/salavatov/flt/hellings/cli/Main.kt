@@ -1,13 +1,10 @@
 package com.bsse2018.salavatov.flt.hellings.cli
 
-import com.bsse2018.salavatov.flt.grammars.CYKQuery
 import com.bsse2018.salavatov.flt.grammars.ContextFreeGrammar
-import com.bsse2018.salavatov.flt.grammars.EmptyLanguageException
-import com.bsse2018.salavatov.flt.grammars.HellingsQuery
+import com.bsse2018.salavatov.flt.algorithms.HellingsQuery
 import com.bsse2018.salavatov.flt.utils.graphFromStrings
 import java.io.File
 import java.lang.Exception
-import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
     if (args.size != 3) {

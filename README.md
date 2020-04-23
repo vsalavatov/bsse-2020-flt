@@ -19,6 +19,10 @@ Formal Language Theory @ SPBU MSE home assignments
   ```bash
   $ gradlew installDist
   ``` 
-  Исполняемые файлы находятся в папках вида `{task}/build/install/{task}/bin`
+  Executables are located in `{task}/build/install/{task}/bin`
+  
+## Query Language
+See [specification](/QueryLanguage.md).
+
 ## Author
 Vadim Salavatov <xremmargorpx@gmail.com>

@@ -1,5 +1,6 @@
 package com.bsse2018.salavatov.flt.grammars
 
+import com.bsse2018.salavatov.flt.algorithms.CFPQTensorQuery
 import com.bsse2018.salavatov.flt.automata.PushDownAutomaton
 import com.bsse2018.salavatov.flt.utils.Graph
 import org.junit.jupiter.api.Assertions.*
@@ -20,7 +21,10 @@ internal class CFPQTensorTest : CFPQCommonTestSuite() {
         )
         assertEquals(
             setOf(Pair(1, 3), Pair(0, 2), Pair(2, 3), Pair(1, 2), Pair(0, 3), Pair(2, 2)),
-            CFPQTensorQuery(TestDataCollection.CYKWorstCaseGraph(), pda)
+            CFPQTensorQuery(
+                TestDataCollection.CYKWorstCaseGraph(),
+                pda
+            )
         )
     }
 
