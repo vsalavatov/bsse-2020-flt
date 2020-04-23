@@ -6,7 +6,7 @@ import kotlin.collections.MutableSet
 class EmptyLanguageException : Exception("Grammar is not habitable")
 class InvalidFormatException(desc: String) : Exception("Invalid format: $desc")
 
-class ContextFreeGrammar(val start: String, rules_: MutableSet<Rule>) {
+open class ContextFreeGrammar(val start: String, rules_: MutableSet<Rule>) {
     val rules: MutableSet<Rule> = mutableSetOf<Rule>()
 
     init {
@@ -381,8 +381,8 @@ class ContextFreeGrammar(val start: String, rules_: MutableSet<Rule>) {
 
     companion object {
         const val Epsilon = "eps"
-        val terminalMatcher = Regex("$Epsilon|[a-z]+[0-9]*")
-        val nonTerminalMatcher = Regex("[A-Z]+[0-9]*")
+        val terminalMatcher = Regex("$Epsilon|[a-z_]+[0-9]*")
+        val nonTerminalMatcher = Regex("[A-Z_]+[0-9]*")
 
         fun isTerminal(node: String) = terminalMatcher.matches(node)
         fun isNonTerminal(node: String) = nonTerminalMatcher.matches(node)
