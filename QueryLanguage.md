@@ -1,5 +1,5 @@
 Query Language definition in [ABNF](https://tools.ietf.org/html/rfc5234) form:
-```ABNF
+```EBNF
 SCRIPT = "" / STATEMENT semicolon SCRIPT
 
 STATEMENT = STMT_CONNECT 
