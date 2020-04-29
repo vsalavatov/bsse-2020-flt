@@ -6,5 +6,6 @@ include 'cfpqmatrix'
 include 'cfpqtensor'
 include 'benchmark'
 include 'querylanganalyzer'
+include 'queryparser'
 include 'core'
 
