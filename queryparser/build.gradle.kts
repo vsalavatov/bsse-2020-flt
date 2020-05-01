@@ -26,6 +26,13 @@ tasks.generateGrammarSource {
     arguments = arguments + listOf("-visitor")
 }
 
+tasks.compileKotlin {
+    dependsOn(tasks.generateGrammarSource)
+}
+tasks.compileTestKotlin {
+    dependsOn(tasks.generateTestGrammarSource)
+}
+
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
 }
