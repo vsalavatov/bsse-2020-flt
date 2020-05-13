@@ -92,7 +92,7 @@ data class PushDownAutomaton(
     }
 }
 
-internal class PDABuilder {
+class PDABuilder {
     val automaton: MutableGraph = mutableListOf()
     val startStates: MutableMap<String, Int> = hashMapOf()
     val finishStates: MutableMap<String, Int> = hashMapOf()
@@ -144,7 +144,7 @@ internal class PDABuilder {
         }
     }
 
-    private fun newNode(): Int {
+    fun newNode(): Int {
         val index = automaton.size
         automaton.add(mutableListOf())
         return index
@@ -157,5 +157,19 @@ internal class PDABuilder {
             finishStates.mapValues { listOf(it.value) },
             start
         )
+    }
+
+    fun copy(): PDABuilder {
+        val that = this
+        return PDABuilder().apply {
+            startStates.putAll(that.startStates)
+            finishStates.putAll(that.finishStates)
+            that.automaton.forEach { edges ->
+                automaton.add(mutableListOf())
+                edges.forEach { edge ->
+                    automaton.last().add(edge.copy())
+                }
+            }
+        }
     }
 }

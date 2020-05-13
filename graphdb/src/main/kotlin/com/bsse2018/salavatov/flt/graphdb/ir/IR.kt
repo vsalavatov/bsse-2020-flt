@@ -55,8 +55,11 @@ object IRPatternStar : IRPatternModifier()
 object IRPatternPlus : IRPatternModifier()
 object IRPatternOptional : IRPatternModifier()
 
-sealed class IRTerminal : IRPattern()
-object IREpsilon : IRTerminal()
+sealed class IRTerminal : IR()
+object IREpsilon : IRTerminal() {
+    val text = "()"
+}
+
 data class IRTerminalPure(val terminal: String) : IRTerminal()
 
 data class IRVertexName(val name: String) : IR()
