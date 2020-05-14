@@ -11,7 +11,7 @@ class ScriptEvaluationContext {
     var connection: String? = null
     val grammarBuilder = PDABuilder()
 
-    fun evaluate(script: IRScript): ScriptEvaluationResult = ResultList(
+    fun evaluate(script: IRScript): ResultList = ResultList(
         script.statements.map {
             evaluate(it)
         }
@@ -26,7 +26,7 @@ class ScriptEvaluationContext {
         }
 
     fun evaluate(statement: IRStatementConnect): ScriptEvaluationResult {
-        connection = statement.destination
+        connection = statement.destination.removeSurrounding("\"", "\"")
         return ResultUnit
     }
 
@@ -115,9 +115,10 @@ class ScriptEvaluationContext {
 
     fun evaluate(statement: IRStatementSelect): ScriptEvaluationResult =
         connection?.let { conn ->
-            val graphFile = Paths.get(conn, statement.fromExpr.from).toFile()
+            val fromFile = statement.fromExpr.from.removeSurrounding("\"", "\"")
+            val graphFile = Paths.get(conn, fromFile).toFile()
             if (!graphFile.exists()) {
-                throw GraphDoesNotExistException(statement.fromExpr.from)
+                throw GraphDoesNotExistException(fromFile)
             }
             val graph = graphFromStrings(graphFile.readLines().filter { it.isNotEmpty() })
 
@@ -148,27 +149,27 @@ class ScriptEvaluationContext {
                 result = result.filter { it.second == pathDesc.toVertexCond.id }.toSet()
             }
 
-            val selected: Set<Any>
+            val selected: Set<String>
 
             if (objVars.size == 2) {
                 if (objVars == whereVars) {
-                    selected = result
+                    selected = result.map { it.toString() }.toSet()
                 } else {
                     assert(objVars.reversed() == whereVars)
-                    selected = result.map { Pair(it.second, it.first) }.toSet()
+                    selected = result.map { Pair(it.second, it.first).toString() }.toSet()
                 }
             } else {
                 if (objVars[0] == whereVars[0]) {
-                    selected = result.map { it.first }.toSet()
+                    selected = result.map { it.first.toString() }.toSet()
                 } else {
                     assert(objVars[0] == whereVars[1])
-                    selected = result.map { it.second }.toSet()
+                    selected = result.map { it.second.toString() }.toSet()
                 }
             }
 
             when (statement.objectExpr) {
                 is IRVerticesExpression -> ResultOutput(
-                    selected.joinToString { "\n" }
+                    selected.joinToString("\n")
                 )
                 is IRCountExpression -> ResultOutput(
                     selected.size.toString()

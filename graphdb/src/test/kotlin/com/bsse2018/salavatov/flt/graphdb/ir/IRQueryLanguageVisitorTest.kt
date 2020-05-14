@@ -1,85 +1,23 @@
 package com.bsse2018.salavatov.flt.graphdb.ir
 
-import QueryLanguageLexer
-import QueryLanguageParser
 import com.bsse2018.salavatov.flt.queryparser.cli.ParseError
-import org.antlr.v4.runtime.*
-import org.antlr.v4.runtime.atn.ATNConfigSet
-import org.antlr.v4.runtime.dfa.DFA
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.util.*
 
 internal class IRQueryLanguageVisitorTest {
-    private fun parse(text: String): IRScript {
-        val lexer = QueryLanguageLexer(CharStreams.fromStream(text.byteInputStream()))
-        val tokenStream = CommonTokenStream(lexer)
-        val parser = QueryLanguageParser(tokenStream)
-        parser.removeErrorListeners()
-        parser.addErrorListener(object : ANTLRErrorListener {
-            override fun reportAttemptingFullContext(
-                recognizer: Parser?,
-                dfa: DFA?,
-                startIndex: Int,
-                stopIndex: Int,
-                conflictingAlts: BitSet?,
-                configs: ATNConfigSet?
-            ) {
-                throw ParseError("Parse error")
-            }
-
-            override fun syntaxError(
-                recognizer: Recognizer<*, *>?,
-                offendingSymbol: Any?,
-                line: Int,
-                charPositionInLine: Int,
-                msg: String?,
-                e: RecognitionException?
-            ) {
-                throw ParseError("Parse error: $msg")
-            }
-
-            override fun reportAmbiguity(
-                recognizer: Parser?,
-                dfa: DFA?,
-                startIndex: Int,
-                stopIndex: Int,
-                exact: Boolean,
-                ambigAlts: BitSet?,
-                configs: ATNConfigSet?
-            ) {
-                throw ParseError("Parse error (ambiguity)")
-            }
-
-            override fun reportContextSensitivity(
-                recognizer: Parser?,
-                dfa: DFA?,
-                startIndex: Int,
-                stopIndex: Int,
-                prediction: Int,
-                configs: ATNConfigSet?
-            ) {
-                throw ParseError("Parse error")
-            }
-
-        })
-        val scriptNode = parser.script()
-        return IRQueryLanguageVisitor.visitScript(scriptNode)
-    }
-
     @Test
     fun `empty script`() {
         assertEquals(
             IRScript(),
-            parse("")
+            parseScriptStrict("")
         )
     }
 
     @Test
     fun `incorrect script`() {
         assertThrows<ParseError> {
-            parse("as af  a agkrjgio ajws")
+            parseScriptStrict("as af  a agkrjgio ajws")
         }
     }
 
@@ -87,7 +25,7 @@ internal class IRQueryLanguageVisitorTest {
     fun `connect statement`() {
         assertEquals(
             IRScript(IRStatementConnect("\"/home/graphs/\"")),
-            parse(
+            parseScriptStrict(
                 """
                 CONNECT TO "/home/graphs/";
             """.trimIndent()
@@ -95,7 +33,7 @@ internal class IRQueryLanguageVisitorTest {
         )
         assertEquals(
             IRScript(IRStatementConnect("\"/home/graphs/\\\"_123$\"")),
-            parse(
+            parseScriptStrict(
                 """
                 CONNECT TO "/home/graphs/\"_123$";
             """.trimIndent()
@@ -103,7 +41,7 @@ internal class IRQueryLanguageVisitorTest {
         )
         assertEquals(
             IRScript(IRStatementConnect("\"\"")),
-            parse(
+            parseScriptStrict(
                 """
                 CONNECT TO "";
             """.trimIndent()
@@ -114,7 +52,7 @@ internal class IRQueryLanguageVisitorTest {
     @Test
     fun `no semicolon throws`() {
         assertThrows<ParseError> {
-            parse("CONNECT TO \"path\"")
+            parseScriptStrict("CONNECT TO \"path\"")
         }
     }
 
@@ -122,7 +60,7 @@ internal class IRQueryLanguageVisitorTest {
     fun `list statement`() {
         assertEquals(
             IRScript(IRStatementList),
-            parse(
+            parseScriptStrict(
                 """
                 LIST GRAPHS;
             """.trimIndent()
@@ -137,7 +75,7 @@ internal class IRQueryLanguageVisitorTest {
                 IRStatementConnect("\"/home/graphs/\""),
                 IRStatementConnect("\"https://graphdbs.com/\"")
             ),
-            parse(
+            parseScriptStrict(
                 """
                 CONNECT TO "/home/graphs/";
                 CONNECT TO "https://graphdbs.com/";
@@ -153,7 +91,7 @@ internal class IRQueryLanguageVisitorTest {
                 IRStatementConnect("\"/home/graphs/old/\""),
                 IRStatementList
             ),
-            parse(
+            parseScriptStrict(
                 """
                 CONNECT TO "/home/graphs/old/";
                 LIST GRAPHS;
@@ -170,7 +108,7 @@ internal class IRQueryLanguageVisitorTest {
                     "S", IRPatternTerminal(IREpsilon, null)
                 )
             ),
-            parse(
+            parseScriptStrict(
                 """
                 S = ();
             """.trimIndent()
@@ -216,7 +154,7 @@ internal class IRQueryLanguageVisitorTest {
                     )
                 )
             ),
-            parse(
+            parseScriptStrict(
                 """
                 V = ((S | eps) b)* (S | ())? a+ b? c*;
             """.trimIndent()
@@ -227,7 +165,7 @@ internal class IRQueryLanguageVisitorTest {
     @Test
     fun `incorrect pattern`() {
         assertThrows<ParseError> {
-            parse("V = ((S | eps) b)* (S | ())? a+ b? c*))))));")
+            parseScriptStrict("V = ((S | eps) b)* (S | ())? a+ b? c*))))));")
         }
     }
 
@@ -247,7 +185,7 @@ internal class IRQueryLanguageVisitorTest {
                     )
                 )
             ),
-            parse("""SELECT u FROM "graph-example.txt" WHERE u--|S|->(v: id=15);""")
+            parseScriptStrict("""SELECT u FROM "graph-example.txt" WHERE u--|S|->(v: id=15);""")
         )
     }
 
@@ -267,7 +205,7 @@ internal class IRQueryLanguageVisitorTest {
                     )
                 )
             ),
-            parse("""SELECT EXISTS (u,v) FROM "graph-example.txt" WHERE u--|S|->v;""")
+            parseScriptStrict("""SELECT EXISTS (u,v) FROM "graph-example.txt" WHERE u--|S|->v;""")
         )
     }
 
@@ -287,7 +225,7 @@ internal class IRQueryLanguageVisitorTest {
                     )
                 )
             ),
-            parse("""SELECT COUNT (u,v) FROM "graph-example.txt" WHERE u--|S|->v;""")
+            parseScriptStrict("""SELECT COUNT (u,v) FROM "graph-example.txt" WHERE u--|S|->v;""")
         )
     }
 }

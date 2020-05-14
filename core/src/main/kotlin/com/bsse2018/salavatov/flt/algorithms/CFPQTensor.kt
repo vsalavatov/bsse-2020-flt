@@ -11,7 +11,7 @@ fun CFPQTensorQuery(graph: Graph, grammar: PushDownAutomaton, epsilonRepr: Strin
     val grammarSize = grammar.automaton.size
     val graphSize = graph.size
 
-    val symbols = grammar.symbols
+    val symbols = grammar.symbols.union(graph.flatMap { it.map { it.first }.toSet() }.toSet())
     val epsEdges = grammar.automaton.mapIndexed { u, edges ->
         edges.filter { it.first == epsilonRepr }
             .map { Pair(u, it.second) }
