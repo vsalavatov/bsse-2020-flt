@@ -33,9 +33,10 @@ class ScriptEvaluationContext {
     fun evaluate(@Suppress("UNUSED_PARAMETER") statement: IRStatementList): ScriptEvaluationResult =
         connection?.let {
             ResultOutput(
-                File(it).listFiles()!!.map { file ->
+                File(it).listFiles()?.map { file ->
                     file.name
-                }.joinToString("\n")
+                }?.joinToString("\n")
+                    ?: throw Exception("Invalid connection")
             )
         } ?: throw NotConnectedException()
 
