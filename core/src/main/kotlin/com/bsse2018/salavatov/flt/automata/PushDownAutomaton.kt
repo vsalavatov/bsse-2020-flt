@@ -17,7 +17,7 @@ data class PushDownAutomaton(
             val result = mutableSetOf<String>()
             automaton.forEach { edges ->
                 edges.forEach { (sym, _) ->
-                    if (sym != Epsilon) result.add(sym)
+                    result.add(sym)
                 }
             }
             startStates.forEach { (nonTerm, _) ->
