@@ -12,6 +12,7 @@ dependencies {
     testRuntimeOnly("org.slf4j:slf4j-simple:1.7.25")
 
     implementation(project(":core"))
+    implementation(project(":queryparser"))
 }
 
 tasks.test {
@@ -19,18 +20,7 @@ tasks.test {
 }
 
 application {
-    mainClassName = "com.bsse2018.salavatov.flt.queryparser.cli.MainKt"
-}
-
-tasks.generateGrammarSource {
-    arguments = arguments + listOf("-visitor")
-}
-
-tasks.compileKotlin {
-    dependsOn(tasks.generateGrammarSource)
-}
-tasks.compileTestKotlin {
-    dependsOn(tasks.generateTestGrammarSource)
+    mainClassName = "com.bsse2018.salavatov.flt.graphdb.cli.MainKt"
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {

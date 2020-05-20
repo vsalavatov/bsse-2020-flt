@@ -1,7 +1,7 @@
 package com.bsse2018.salavatov.flt.queryparser.cli
 
-import antlr.QueryLanguageLexer
-import antlr.QueryLanguageParser
+import QueryLanguageLexer
+import QueryLanguageParser
 import com.bsse2018.salavatov.dotdsl.DotTree
 import com.bsse2018.salavatov.dotdsl.dotTree
 import com.bsse2018.salavatov.dotdsl.dotTree.`--`

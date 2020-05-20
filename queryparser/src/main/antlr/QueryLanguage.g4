@@ -37,8 +37,8 @@ vertex_cond : vertex_name
 
 pattern : (terminal | NONTERMINAL) (PTRN_STAR | PTRN_PLUS | PTRN_OPTION)?
         | LBR pattern RBR (PTRN_STAR | PTRN_PLUS | PTRN_OPTION)?
-        | pattern PTRN_ALT pattern
         | pattern pattern
+        | pattern PTRN_ALT pattern
         ;
 
 terminal : LOWERCASE_WORD
