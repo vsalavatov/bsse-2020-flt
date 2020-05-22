@@ -15,7 +15,7 @@ internal class ScriptEvaluationContextTest {
         val context = ScriptEvaluationContext()
         context.evaluate(IRStatementConnect('"' + datasetPath + '"'))
         val result = context.evaluate(IRStatementList) as ResultOutput
-        assertEquals(7, result.text.trim().split("\n").size)
+        assertEquals(8, result.text.trim().split("\n").size)
     }
 
     @Test
@@ -240,6 +240,153 @@ internal class ScriptEvaluationContextTest {
                 linesAsSets = true
             )
         }
+
+        @Test
+        fun `multiple connects`() {
+            assertThrows<GraphDoesNotExistException> {
+                checkOneOutput(
+                    """
+                    CONNECT TO "${datasetPath}";
+                    CONNECT TO "${datasetPath}/empty/";
+                    SELECT EXISTS u FROM "graph" WHERE u--|a|->v;
+                """.trimIndent(), ""
+                )
+            }
+            checkOneOutput(
+                """
+                    CONNECT TO "${datasetPath}/empty/";
+                    CONNECT TO "${datasetPath}";
+                    SELECT EXISTS u FROM "worstcase_4" WHERE u--|a|->v;
+                """.trimIndent(), "yes"
+            )
+        }
+
+        @Test
+        fun `pattern does not affect context`() {
+            checkOutputs(
+                """
+                CONNECT TO "${datasetPath}";
+                S = b (b b)*;
+                SELECT EXISTS u FROM "worstcase_4" WHERE (u: id=3)--|S|->(v: id=3);
+                SELECT EXISTS u FROM "worstcase_4" WHERE (u: id=3)--|S b|->(v: id=3);
+                SELECT EXISTS u FROM "worstcase_4" WHERE (u: id=3)--|S|->(v: id=3);
+                SELECT EXISTS u FROM "worstcase_4" WHERE (u: id=3)--|S S|->(v: id=3);
+                F = b S;
+                SELECT EXISTS u FROM "worstcase_4" WHERE u--|F S|->v;
+            """.trimIndent(), "no", "yes", "no", "yes", "yes"
+            )
+        }
+
+        @Test
+        fun `undeclared pattern`() {
+            checkOutputs(
+                """
+                CONNECT TO "${datasetPath}";
+                S = b (b b)*;
+                SELECT EXISTS u FROM "worstcase_4" WHERE (u: id=3)--|S S|->(v: id=3);
+                SELECT EXISTS u FROM "worstcase_4" WHERE (u: id=3)--|S S|->(v: id=0);
+                SELECT EXISTS u FROM "worstcase_4" WHERE (u: id=3)--|S|->(v: id=0);
+                F = b S;
+                SELECT EXISTS u FROM "worstcase_4" WHERE u--|F S|->v;
+                SELECT EXISTS u FROM "worstcase_4" WHERE (u: id=1)--|Q S|->(v: id=2);
+            """.trimIndent(), "yes", "no", "yes", "yes", "no"
+            )
+        }
+
+        @Test
+        fun `path declaration using same variable name must throw`() {
+            assertThrows<LogicErrorException> {
+                checkOutputs(
+                    """
+                    CONNECT TO "${datasetPath}";
+                    SELECT EXISTS u FROM "worstcase_4" WHERE (u: id=3)--|S S|->(u: id=3);
+                """.trimIndent()
+                )
+            }
+        }
+
+        @Test
+        fun `select using same variable name must throw`() {
+            assertThrows<LogicErrorException> {
+                checkOutputs(
+                    """
+                    CONNECT TO "${datasetPath}";
+                    SELECT COUNT (u, u) FROM "worstcase_4" WHERE u--|b (b b)*|->v;
+                """.trimIndent()
+                )
+            }
+        }
+
+        @Test
+        fun `unknown variable in select must throw`() {
+            assertThrows<LogicErrorException> {
+                checkOutputs(
+                    """
+                    CONNECT TO "${datasetPath}";
+                    SELECT COUNT (u, g) FROM "worstcase_4" WHERE u--|b (b b)*|->v;
+                """.trimIndent()
+                )
+            }
+        }
+
+        @Test
+        fun `declaration of existing pattern is actually an alternative`() {
+            checkOutputs(
+                """
+                CONNECT TO "${datasetPath}";
+                S = b;
+                SELECT EXISTS u FROM "worstcase_4" WHERE (u: id=3)--|S|->(v: id=0);
+                SELECT EXISTS u FROM "worstcase_4" WHERE (u: id=3)--|S|->(v: id=3);
+                SELECT EXISTS u FROM "worstcase_4" WHERE (u: id=3)--|S S|->(v: id=0);
+                SELECT EXISTS u FROM "worstcase_4" WHERE (u: id=3)--|S S|->(v: id=3);
+                S = a;
+                SELECT EXISTS u FROM "worstcase_4" WHERE (u: id=3)--|S|->(v: id=0);
+                SELECT EXISTS u FROM "worstcase_4" WHERE (u: id=3)--|S|->(v: id=3);
+                SELECT EXISTS u FROM "worstcase_4" WHERE (u: id=3)--|S S|->(v: id=0);
+                SELECT EXISTS u FROM "worstcase_4" WHERE (u: id=3)--|S S|->(v: id=3);
+            """.trimIndent(), "yes", "no", "no", "yes", "yes", "no", "no", "yes"
+            )
+        }
+
+        @Test
+        fun `pattern option behavior`() {
+            checkOutputs(
+                """
+                CONNECT TO "${datasetPath}";
+                SELECT EXISTS u FROM "worstcase_4" WHERE (u: id=3)--|b?|->(v: id=0);
+                SELECT EXISTS u FROM "worstcase_4" WHERE (u: id=3)--|b?|->(v: id=3);
+                SELECT EXISTS u FROM "worstcase_4" WHERE (u: id=2)--|a?|->(v: id=3);
+                SELECT EXISTS u FROM "worstcase_4" WHERE (u: id=2)--|a?|->(v: id=1);
+            """.trimIndent(), "yes", "yes", "no", "yes"
+            )
+        }
+
+        @Test
+        fun `pattern plus behavior`() {
+            checkOutputs(
+                """
+                CONNECT TO "${datasetPath}";
+                SELECT EXISTS u FROM "custom_cbs" WHERE (u: id=0)--|a a b|->(v: id=0);
+                SELECT EXISTS u FROM "custom_cbs" WHERE (u: id=0)--|a a b a b|->(v: id=0);
+                SELECT EXISTS u FROM "custom_cbs" WHERE (u: id=0)--|a (a b)+|->(v: id=0);
+            """.trimIndent(), "no", "yes", "yes"
+            )
+        }
+
+        @Test
+        fun `pattern star behavior`() {
+            checkOutputs(
+                """
+                CONNECT TO "${datasetPath}";
+                SELECT EXISTS u FROM "custom_cbs" WHERE (u: id=2)--|b a b a a|->(v: id=2);
+                SELECT EXISTS u FROM "custom_cbs" WHERE (u: id=2)--|b a b a*|->(v: id=2);
+                SELECT EXISTS u FROM "custom_cbs" WHERE (u: id=2)--|(b a b a)*|->(v: id=2);
+                SELECT EXISTS u FROM "custom_cbs" WHERE (u: id=2)--|b a (b a)* a|->(v: id=2);
+                SELECT EXISTS u FROM "custom_cbs" WHERE (u: id=2)--|b a (b a)* a a|->(v: id=2);
+                SELECT EXISTS u FROM "custom_cbs" WHERE (u: id=2)--|((b a)* a)+|->(v: id=2);
+            """.trimIndent(), "yes", "yes", "yes", "yes", "no", "yes"
+            )
+        }
     }
 
     private fun checkOneOutput(scriptText: String, expectedResult: String, linesAsSets: Boolean = false) {
@@ -255,6 +402,17 @@ internal class ScriptEvaluationContextTest {
             )
         } else {
             assertEquals(expectedResult, (result[0] as ResultOutput).text.trim())
+        }
+    }
+
+    private fun checkOutputs(scriptText: String, vararg expectedResults: String) {
+        val script = parseScriptStrict(scriptText)
+        val context = ScriptEvaluationContext()
+        val result = context.evaluate(script).results.filter { it !is ResultUnit }
+        assertTrue(result.size == expectedResults.size)
+        assertTrue(result.all { it is ResultOutput })
+        for (i in result.indices) {
+            assertEquals(expectedResults[i], (result[i] as ResultOutput).text.trim())
         }
     }
 }
