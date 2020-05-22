@@ -84,3 +84,12 @@ SELECT u FROM "graph-example.txt" WHERE u--|S|->(v: id=15);
 SELECT COUNT (u,v) FROM "another-example.txt" WHERE u--|Eps|->v;
 SELECT EXISTS v FROM "third-example.txt" WHERE f--|a (a b)+ b|->v;
 ```
+
+New part of the abstract syntax (additional task):
+```
+stmt:
+    ...
+    | list_graphs
+    | list_graphs_with_path of String
+    | list_labels of String
+```
