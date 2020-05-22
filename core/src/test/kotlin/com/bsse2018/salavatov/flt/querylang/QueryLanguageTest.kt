@@ -122,4 +122,16 @@ kw_select kw_exists lowercase_word kw_from string_desc kw_where lowercase_word a
             )
         )
     }
+
+    @Test
+    fun `list graphs from another source`() {
+        val query = "kw_list kw_graphs string_desc semicolon".toQuery()
+        assertTrue(CYKQuery(QueryLanguage, query))
+    }
+
+    @Test
+    fun `list labels`() {
+        val query = "kw_list kw_labels string_desc semicolon".toQuery()
+        assertTrue(CYKQuery(QueryLanguage, query))
+    }
 }

@@ -8,7 +8,8 @@ STATEMENT = STMT_CONNECT
           / STMT_PATTERN_DECL
  
 STMT_CONNECT = kw_connect kw_to string_desc 
-STMT_LIST = kw_list kw_graphs
+STMT_LIST = kw_list kw_graphs [string_desc] 
+          / kw_list kw_labels string_desc
 STMT_SELECT = kw_select OBJECT_EXPR FROM_EXPR WHERE_EXPR 
 STMT_PATTERN_DECL = nonterminal eq PATTERN
 
@@ -68,12 +69,15 @@ kw_where = "WHERE"
 kw_count = "COUNT"
 kw_exists = "EXISTS"
 kw_id = "ID"
+kw_labels = "LABELS"
 ```
 
 Example:
 ```
 CONNECT TO "~/graphs/";
 LIST GRAPHS;
+LIST GRAPHS "~/graphs-2/";
+LIST LABELS "worstcase_4";
 S = a S b S | ();
 Eps = ();
 SELECT u FROM "graph-example.txt" WHERE u--|S|->(v: id=15);
