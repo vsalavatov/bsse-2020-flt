@@ -40,9 +40,8 @@ class ScriptEvaluationContext {
                     ?: connection
                     ?: throw NotConnectedException()
                 return ResultOutput(
-                    File(path).listFiles()!!.joinToString("\n") { file ->
-                        file.name
-                    }
+                    (File(path).listFiles() ?: throw Exception("Given path doesn't represent a directory")
+                            ).joinToString("\n") { file -> file.name }
                 )
             }
             is IRStatementListLabels -> {
@@ -136,7 +135,7 @@ class ScriptEvaluationContext {
     }
 
     fun evaluate(statement: IRStatementSelect): ScriptEvaluationResult =
-        connection?.let { conn ->
+        connection?.let {
             val fromFile = statement.fromExpr.from.fromStringDesc()
             val graph = graphFromPath(fromFile)
 
