@@ -37,7 +37,16 @@ object IRQueryLanguageVisitor : QueryLanguageVisitor<IR> {
     }
 
     override fun visitStmt_list(ctx: QueryLanguageParser.Stmt_listContext): IRStatementList {
-        return IRStatementList
+        ctx.KW_GRAPHS()?.let {
+            return IRStatementListGraphs(ctx.STRING_DESC()?.text)
+        }
+        ctx.KW_LABELS()?.let {
+            return IRStatementListLabels(
+                ctx.STRING_DESC()?.text
+                    ?: throw UnexpectedParseResultException("$ctx doesn't specify a graph to list labels from")
+            )
+        }
+        throw UnexpectedParseResultException("$ctx doesn't look like StatementList")
     }
 
     override fun visitStmt_select(ctx: QueryLanguageParser.Stmt_selectContext): IRStatementSelect {
