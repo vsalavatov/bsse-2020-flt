@@ -8,7 +8,9 @@ data class IRScript(val statements: List<IRStatement>) : IR() {
 
 sealed class IRStatement : IR()
 data class IRStatementConnect(val destination: String) : IRStatement()
-object IRStatementList : IRStatement()
+sealed class IRStatementList : IRStatement()
+data class IRStatementListGraphs(val path: String? = null) : IRStatementList()
+data class IRStatementListLabels(val graphPath: String) : IRStatementList()
 data class IRStatementPatternDeclaration(val nonterminal: String, val pattern: IRPattern) : IRStatement()
 data class IRStatementSelect(
     val objectExpr: IRObjectExpression,

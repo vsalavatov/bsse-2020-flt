@@ -9,7 +9,9 @@ statement : stmt_connect
           ;
 
 stmt_connect : KW_CONNECT KW_TO STRING_DESC ;
-stmt_list : KW_LIST KW_GRAPHS ;
+stmt_list : KW_LIST KW_GRAPHS STRING_DESC?
+          | KW_LIST KW_LABELS STRING_DESC
+          ;
 stmt_select : KW_SELECT object_expr from_expr where_expr ;
 stmt_pattern_decl : NONTERMINAL EQ pattern ;
 
@@ -71,6 +73,7 @@ KW_FROM : 'FROM' ;
 KW_WHERE : 'WHERE' ;
 KW_COUNT : 'COUNT' ;
 KW_EXISTS : 'EXISTS' ;
+KW_LABELS : 'LABELS' ;
 KW_ID : 'id' ;
 LOWERCASE_WORD : [a-z]+ ;
 INTEGER : [0-9]+ ;

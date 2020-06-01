@@ -57,15 +57,42 @@ internal class IRQueryLanguageVisitorTest {
     }
 
     @Test
-    fun `list statement`() {
+    fun `list graphs statement`() {
         assertEquals(
-            IRScript(IRStatementList),
+            IRScript(IRStatementListGraphs()),
             parseScriptStrict(
                 """
                 LIST GRAPHS;
             """.trimIndent()
             )
         )
+        assertEquals(
+            IRScript(IRStatementListGraphs("\"~/db/graphs/\"")),
+            parseScriptStrict(
+                """
+                LIST GRAPHS "~/db/graphs/";
+            """.trimIndent()
+            )
+        )
+    }
+
+    @Test
+    fun `list labels statement`() {
+        assertEquals(
+            IRScript(IRStatementListLabels("\"sample-graph\"")),
+            parseScriptStrict(
+                """
+                LIST LABELS "sample-graph";
+            """.trimIndent()
+            )
+        )
+        assertThrows<ParseError> {
+            parseScriptStrict(
+                """
+                LIST LABELS;
+            """.trimIndent()
+            )
+        }
     }
 
     @Test
@@ -89,7 +116,7 @@ internal class IRQueryLanguageVisitorTest {
         assertEquals(
             IRScript(
                 IRStatementConnect("\"/home/graphs/old/\""),
-                IRStatementList
+                IRStatementListGraphs()
             ),
             parseScriptStrict(
                 """

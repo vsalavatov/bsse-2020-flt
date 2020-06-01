@@ -13,6 +13,8 @@ STATEMENT STMT_PATTERN_DECL
  
 STMT_CONNECT kw_connect kw_to string_desc 
 STMT_LIST kw_list kw_graphs
+STMT_LIST kw_list kw_graphs string_desc
+STMT_LIST kw_list kw_labels string_desc
 STMT_SELECT kw_select OBJECT_EXPR FROM_EXPR WHERE_EXPR 
 STMT_PATTERN_DECL nonterminal eq PATTERN
 

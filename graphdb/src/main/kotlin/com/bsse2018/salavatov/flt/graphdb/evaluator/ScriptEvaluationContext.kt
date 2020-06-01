@@ -3,6 +3,7 @@ package com.bsse2018.salavatov.flt.graphdb.evaluator
 import com.bsse2018.salavatov.flt.algorithms.CFPQTensorQuery
 import com.bsse2018.salavatov.flt.automata.PDABuilder
 import com.bsse2018.salavatov.flt.graphdb.ir.*
+import com.bsse2018.salavatov.flt.utils.Graph
 import com.bsse2018.salavatov.flt.utils.graphFromStrings
 import java.io.File
 import java.nio.file.Paths
@@ -10,6 +11,8 @@ import java.nio.file.Paths
 class ScriptEvaluationContext {
     var connection: String? = null
     val grammarBuilder = PDABuilder()
+
+    fun String.fromStringDesc() = removeSurrounding("\"", "\"")
 
     fun evaluate(script: IRScript): ResultList = ResultList(
         script.statements.map {
@@ -26,20 +29,37 @@ class ScriptEvaluationContext {
         }
 
     fun evaluate(statement: IRStatementConnect): ScriptEvaluationResult {
-        connection = statement.destination.removeSurrounding("\"", "\"")
+        connection = statement.destination.fromStringDesc()
         return ResultUnit
     }
 
-    fun evaluate(@Suppress("UNUSED_PARAMETER") statement: IRStatementList): ScriptEvaluationResult =
-        connection?.let {
-            ResultOutput(
-                File(it).listFiles()?.map { file ->
-                    file.name
-                }?.joinToString("\n")
-                    ?: throw Exception("Invalid connection")
-            )
-        } ?: throw NotConnectedException()
+    fun evaluate(statement: IRStatementList): ScriptEvaluationResult {
+        when (statement) {
+            is IRStatementListGraphs -> {
+                val path = statement.path?.fromStringDesc()
+                    ?: connection
+                    ?: throw NotConnectedException()
+                return ResultOutput(
+                    (File(path).listFiles() ?: throw Exception("Given path doesn't represent a directory")
+                            ).joinToString("\n") { file -> file.name }
+                )
+            }
+            is IRStatementListLabels -> {
+                val graph = graphFromPath(statement.graphPath.fromStringDesc())
+                return ResultOutput(
+                    graph.flatMap { edges -> edges.map { it.first }.toSet() }.toSet().joinToString("\n")
+                )
+            }
+        }
+    }
 
+    private fun graphFromPath(graphPath: String): Graph {
+        val graphFile = Paths.get(connection ?: throw NotConnectedException(), graphPath).toFile()
+        if (!graphFile.exists()) {
+            throw GraphDoesNotExistException(graphPath)
+        }
+        return graphFromStrings(graphFile.readLines().filter { it.isNotEmpty() })
+    }
 
     fun evaluate(statement: IRStatementPatternDeclaration): ScriptEvaluationResult {
         grammarBuilder.addRule(statement)
@@ -115,13 +135,9 @@ class ScriptEvaluationContext {
     }
 
     fun evaluate(statement: IRStatementSelect): ScriptEvaluationResult =
-        connection?.let { conn ->
-            val fromFile = statement.fromExpr.from.removeSurrounding("\"", "\"")
-            val graphFile = Paths.get(conn, fromFile).toFile()
-            if (!graphFile.exists()) {
-                throw GraphDoesNotExistException(fromFile)
-            }
-            val graph = graphFromStrings(graphFile.readLines().filter { it.isNotEmpty() })
+        connection?.let {
+            val fromFile = statement.fromExpr.from.fromStringDesc()
+            val graph = graphFromPath(fromFile)
 
             val objVars = statement.objectExpr.variables()
             val whereVars = statement.whereExpr.variables()

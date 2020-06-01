@@ -13,15 +13,24 @@ internal class ScriptEvaluationContextTest {
     @Test
     fun `connect and list`() {
         val context = ScriptEvaluationContext()
-        context.evaluate(IRStatementConnect('"' + datasetPath + '"'))
-        val result = context.evaluate(IRStatementList) as ResultOutput
+        context.evaluate(IRStatementConnect("\"$datasetPath\""))
+        val result = context.evaluate(IRStatementListGraphs()) as ResultOutput
         assertEquals(8, result.text.trim().split("\n").size)
+    }
+
+    @Test
+    fun `connect and list with path override`() {
+        val context = ScriptEvaluationContext()
+        context.evaluate(IRStatementConnect("\"$datasetPath\""))
+        val result = context.evaluate(IRStatementListGraphs("\"$datasetPath/empty/\"")) as ResultOutput
+        assertEquals(1, result.text.trim().split("\n").size)
     }
 
     @Test
     fun `throws on list without connect`() {
         val context = ScriptEvaluationContext()
-        assertThrows<NotConnectedException> { context.evaluate(IRStatementList) }
+        assertThrows<NotConnectedException> { context.evaluate(IRStatementListGraphs()) }
+        assertThrows<NotConnectedException> { context.evaluate(IRStatementListLabels("graph-sample")) }
     }
 
     @Test
@@ -46,6 +55,25 @@ internal class ScriptEvaluationContextTest {
 
     @Nested
     inner class ParserIntegrated {
+        @Test
+        fun `list labels`() {
+            checkOneOutput(
+                """
+                    CONNECT TO "$datasetPath";
+                    LIST LABELS "worstcase_4";
+                """.trimIndent(),
+                setOf("a", "b").joinToString("\n"),
+                linesAsSets = true
+            )
+            checkOneOutput(
+                """
+                    CONNECT TO "$datasetPath";
+                    LIST LABELS "fullgraph_10";
+                """.trimIndent(),
+                "a"
+            )
+        }
+
         @Test
         fun `fullgraph a*`() {
             checkOneOutput(
